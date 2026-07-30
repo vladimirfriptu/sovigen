@@ -1,4 +1,5 @@
 import datetime
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -6,7 +7,7 @@ from . import artifacts
 from . import meta as meta_mod
 from . import paths
 from .ffmpegcmd import build_static_video_cmd
-from .inputs import find_audio, find_image
+from .inputs import AUDIO_EXTS, IMAGE_EXTS, find_audio, find_image
 from .slug import slugify
 
 OUTPUT_FILENAME = "youtube.mp4"
@@ -91,6 +92,31 @@ def cmd_publish(slug: str) -> None:
     sdir = _require_song(slug)
     today = datetime.date.today().isoformat()
     meta_mod.set_stage(sdir, "published", today)
+
+
+def cmd_import(slug: str, src) -> Path:
+    sdir = _require_song(slug)
+    source = Path(src)
+    if not source.is_file():
+        raise CommandError(f"File not found: {source}")
+    ext = source.suffix.lower()
+    if ext in AUDIO_EXTS:
+        dest = sdir / "track.mp3"
+    elif ext in IMAGE_EXTS:
+        dest = sdir / f"cover{ext}"
+    else:
+        raise CommandError(f"unsupported file type: {ext or source.name}")
+    _stash_existing(sdir, AUDIO_EXTS if ext in AUDIO_EXTS else IMAGE_EXTS)
+    shutil.copy2(source, dest)
+    return dest
+
+
+def _stash_existing(song_dir: Path, exts: set) -> None:
+    raw_dir = song_dir / "raw"
+    raw_dir.mkdir(exist_ok=True)
+    for entry in sorted(song_dir.iterdir()):
+        if entry.is_file() and entry.suffix.lower() in exts:
+            entry.rename(raw_dir / entry.name)
 
 
 def cmd_status() -> list:

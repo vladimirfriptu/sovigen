@@ -163,3 +163,52 @@ def test_status_lists_rows(lib):
     _make_song(lib, "song-e", stage="ready")
     rows = commands.cmd_status()
     assert {"slug": "song-e", "stage": "ready", "title": "song-e"} in rows
+
+
+def test_import_audio_to_canonical_name(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src = tmp_path / "Suno v5 take 3.mp3"
+    src.write_bytes(b"audio")
+    dest = commands.cmd_import("s", src)
+    assert dest == sdir / "track.mp3"
+    assert dest.read_bytes() == b"audio"
+
+
+def test_import_keeps_source_file(lib, tmp_path):
+    _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src = tmp_path / "take.mp3"
+    src.write_bytes(b"audio")
+    commands.cmd_import("s", src)
+    assert src.exists()
+
+
+def test_import_image_keeps_extension(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="recorded", with_inputs=False)
+    src = tmp_path / "Gemini_Generated_Image.png"
+    src.write_bytes(b"img")
+    assert commands.cmd_import("s", src) == sdir / "cover.png"
+
+
+def test_import_moves_previous_file_to_raw(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    (sdir / "track.mp3").write_bytes(b"old")
+    src = tmp_path / "new.mp3"
+    src.write_bytes(b"new")
+    commands.cmd_import("s", src)
+    assert (sdir / "track.mp3").read_bytes() == b"new"
+    assert (sdir / "raw" / "track.mp3").read_bytes() == b"old"
+
+
+def test_import_rejects_unknown_extension(lib, tmp_path):
+    _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src = tmp_path / "notes.txt"
+    src.write_text("x", encoding="utf-8")
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_import("s", src)
+    assert "unsupported file type" in str(err.value)
+
+
+def test_import_missing_source(lib, tmp_path):
+    _make_song(lib, "s", stage="prompted", with_inputs=False)
+    with pytest.raises(commands.CommandError):
+        commands.cmd_import("s", tmp_path / "nope.mp3")
