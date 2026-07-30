@@ -116,7 +116,21 @@ def _stash_existing(song_dir: Path, exts: set) -> None:
     raw_dir.mkdir(exist_ok=True)
     for entry in sorted(song_dir.iterdir()):
         if entry.is_file() and entry.suffix.lower() in exts:
-            entry.rename(raw_dir / entry.name)
+            entry.rename(_free_name(raw_dir, entry.name))
+
+
+def _free_name(raw_dir: Path, name: str) -> Path:
+    candidate = raw_dir / name
+    if not candidate.exists():
+        return candidate
+    stem = Path(name).stem
+    suffix = Path(name).suffix
+    counter = 2
+    while True:
+        candidate = raw_dir / f"{stem}-{counter}{suffix}"
+        if not candidate.exists():
+            return candidate
+        counter += 1
 
 
 def cmd_status() -> list:

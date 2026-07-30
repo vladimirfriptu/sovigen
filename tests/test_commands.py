@@ -199,6 +199,23 @@ def test_import_moves_previous_file_to_raw(lib, tmp_path):
     assert (sdir / "raw" / "track.mp3").read_bytes() == b"old"
 
 
+def test_import_three_successive_audio_files_keep_all_payloads(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src1 = tmp_path / "v1.mp3"
+    src1.write_bytes(b"v1")
+    src2 = tmp_path / "v2.mp3"
+    src2.write_bytes(b"v2")
+    src3 = tmp_path / "v3.mp3"
+    src3.write_bytes(b"v3")
+    commands.cmd_import("s", src1)
+    commands.cmd_import("s", src2)
+    commands.cmd_import("s", src3)
+    assert (sdir / "track.mp3").read_bytes() == b"v3"
+    raw_dir = sdir / "raw"
+    stashed = {p.name: p.read_bytes() for p in raw_dir.glob("track*.mp3")}
+    assert stashed == {"track.mp3": b"v1", "track-2.mp3": b"v2"}
+
+
 def test_import_rejects_unknown_extension(lib, tmp_path):
     _make_song(lib, "s", stage="prompted", with_inputs=False)
     src = tmp_path / "notes.txt"
