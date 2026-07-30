@@ -110,6 +110,24 @@ def test_build_ffmpeg_failure_keeps_stage(lib, monkeypatch):
     assert meta.read_meta(lib / "song-c")["stage"] == "ready"
 
 
+def test_build_refuses_song_not_at_ready(lib, monkeypatch):
+    sdir = _make_song(lib, "song-idea", stage="idea")
+    _fake_ffmpeg_ok(monkeypatch)
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_build("song-idea")
+    assert "idea" in str(err.value)
+    assert not (sdir / "youtube.mp4").exists()
+    assert meta.read_meta(sdir)["stage"] == "idea"
+
+
+def test_build_does_not_move_a_published_song_backwards(lib, monkeypatch):
+    sdir = _make_song(lib, "song-done", stage="published")
+    _fake_ffmpeg_ok(monkeypatch)
+    with pytest.raises(commands.CommandError):
+        commands.cmd_build("song-done")
+    assert meta.read_meta(sdir)["stage"] == "published"
+
+
 def test_build_all_only_ready(lib, monkeypatch):
     _make_song(lib, "ready-one", stage="ready")
     _make_song(lib, "idea-one", stage="idea")

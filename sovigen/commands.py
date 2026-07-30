@@ -17,6 +17,15 @@ class CommandError(Exception):
     pass
 
 
+def _read_meta_or_fail(slug: str, song_dir: Path) -> dict:
+    if not meta_mod.has_meta(song_dir):
+        raise CommandError(f"{slug} has no meta.json")
+    try:
+        return meta_mod.read_meta(song_dir)
+    except (ValueError, OSError) as err:
+        raise CommandError(f"cannot read {slug}/meta.json: {err}") from err
+
+
 def _require_song(slug: str) -> Path:
     sdir = paths.song_dir(slug)
     if not sdir.is_dir():
@@ -45,6 +54,13 @@ def cmd_new(title: str, *, source=None, series=None, language: str = "uk") -> Pa
 
 def cmd_build(slug: str) -> Path:
     sdir = _require_song(slug)
+    data = _read_meta_or_fail(slug, sdir)
+    stage = data.get("stage", "?")
+    if stage != "ready":
+        raise CommandError(
+            f"cannot build {slug}: stage is {stage}, expected ready. "
+            "Use advance to get the song to ready first."
+        )
     output = sdir / VIDEO_FILENAME
     if output.exists():
         raise CommandError(f"{VIDEO_FILENAME} already exists for {slug}")
