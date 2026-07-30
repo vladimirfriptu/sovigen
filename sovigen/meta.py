@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 from pathlib import Path
 
 META_VERSION = 2
@@ -75,7 +77,19 @@ def _normalize(data: dict) -> dict:
 def write_meta(song_dir: Path, meta: dict) -> None:
     path = meta_path(song_dir)
     text = json.dumps(meta, ensure_ascii=False, indent=2)
-    path.write_text(text + "\n", encoding="utf-8")
+    # Same directory, so os.replace stays atomic: an interrupted run leaves the
+    # previous meta.json intact instead of a truncated one.
+    fd, tmp_name = tempfile.mkstemp(dir=song_dir, prefix=".meta-", suffix=".tmp")
+    tmp_path = Path(tmp_name)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(text + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp_path, path)
+    except BaseException:
+        tmp_path.unlink(missing_ok=True)
+        raise
 
 
 def set_stage(song_dir: Path, stage: str, at: str) -> None:
@@ -88,6 +102,8 @@ def set_stage(song_dir: Path, stage: str, at: str) -> None:
 
 
 def next_stage(stage: str):
+    if stage not in STAGES:
+        return None
     index = STAGES.index(stage)
     if index + 1 >= len(STAGES):
         return None

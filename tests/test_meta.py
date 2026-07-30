@@ -81,3 +81,29 @@ def test_next_stage():
     assert meta.next_stage("idea") == "brief"
     assert meta.next_stage("ready") == "pre-published"
     assert meta.next_stage("published") is None
+
+
+def test_next_stage_unknown_returns_none(tmp_path):
+    assert meta.next_stage("mastering") is None
+    assert meta.next_stage("") is None
+
+
+def test_write_is_atomic_on_failure(tmp_path, monkeypatch):
+    original = meta.new_meta("X", "x", "2026-07-30")
+    meta.write_meta(tmp_path, original)
+
+    def boom(src, dst):
+        raise OSError("no space left on device")
+
+    monkeypatch.setattr(meta.os, "replace", boom)
+    with pytest.raises(OSError):
+        meta.write_meta(tmp_path, {**original, "stage": "brief"})
+    assert meta.read_meta(tmp_path) == original
+    assert list(tmp_path.glob(".meta-*")) == []
+
+
+def test_write_leaves_no_zero_byte_meta(tmp_path):
+    meta.write_meta(tmp_path, meta.new_meta("X", "x", "2026-07-30"))
+    meta.write_meta(tmp_path, meta.new_meta("Y", "y", "2026-07-30"))
+    assert (tmp_path / "meta.json").stat().st_size > 0
+    assert list(tmp_path.glob(".meta-*")) == []
