@@ -11,12 +11,12 @@ def lib(monkeypatch, tmp_path):
     return tmp_path / "library"
 
 
-def _make_song(lib, slug, stage="draft", with_inputs=True):
+def _make_song(lib, slug, stage="idea", with_inputs=True):
     sdir = lib / slug
     (sdir / "raw").mkdir(parents=True)
     meta.write_meta(sdir, meta.new_meta(slug, slug, "2026-06-22"))
-    if stage != "draft":
-        meta.set_stage(sdir, stage)
+    if stage != "idea":
+        meta.set_stage(sdir, stage, "2026-06-22")
     if with_inputs:
         (sdir / "cover.png").write_bytes(b"")
         (sdir / "track.mp3").write_bytes(b"")
@@ -38,11 +38,27 @@ def _fake_ffmpeg_ok(monkeypatch):
 
 
 def test_new_creates_structure(lib):
-    sdir = commands.cmd_new("My Track Name")
-    assert sdir == lib / "my-track-name"
+    sdir = commands.cmd_new("Мій щит")
     assert (sdir / "raw").is_dir()
-    assert meta.read_meta(sdir)["stage"] == "draft"
-    assert meta.read_meta(sdir)["title"] == "My Track Name"
+    assert (sdir / "meta.json").is_file()
+    data = meta.read_meta(sdir)
+    assert data["stage"] == "idea"
+    assert data["meta_version"] == 2
+
+
+def test_new_renders_artifacts(lib):
+    sdir = commands.cmd_new("Мій щит")
+    for name in ["brief.md", "lyrics.md", "suno.md", "cover-prompt.md",
+                 "youtube.md", "notes.md"]:
+        assert (sdir / name).is_file(), name
+
+
+def test_new_records_source_and_series(lib):
+    sdir = commands.cmd_new("Мій щит", source="psalm-3", series="psalms")
+    data = meta.read_meta(sdir)
+    assert data["source"] == "psalm-3"
+    assert data["series"] == "psalms"
+    assert "source: psalm-3" in (sdir / "brief.md").read_text(encoding="utf-8")
 
 
 def test_new_rejects_existing(lib):

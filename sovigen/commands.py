@@ -2,6 +2,7 @@ import datetime
 import subprocess
 from pathlib import Path
 
+from . import artifacts
 from . import meta as meta_mod
 from . import paths
 from .ffmpegcmd import build_static_video_cmd
@@ -23,7 +24,7 @@ def _require_song(slug: str) -> Path:
     return sdir
 
 
-def cmd_new(title: str) -> Path:
+def cmd_new(title: str, *, source=None, series=None, language: str = "uk") -> Path:
     slug = slugify(title)
     if not slug:
         raise CommandError(f"Could not derive a slug from title: {title!r}")
@@ -33,8 +34,11 @@ def cmd_new(title: str) -> Path:
     raw_dir = sdir / "raw"
     raw_dir.mkdir(parents=True)
     today = datetime.date.today().isoformat()
-    data = meta_mod.new_meta(title, slug, today)
+    data = meta_mod.new_meta(
+        title, slug, today, source=source, series=series, language=language
+    )
     meta_mod.write_meta(sdir, data)
+    artifacts.render(sdir, data)
     return sdir
 
 
