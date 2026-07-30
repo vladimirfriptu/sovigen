@@ -8,16 +8,24 @@ class InputError(Exception):
     pass
 
 
+class MissingInputError(InputError):
+    pass
+
+
+class AmbiguousInputError(InputError):
+    pass
+
+
 def _find_single(song_dir: Path, exts: set, kind: str) -> Path:
     matches = []
     for entry in sorted(song_dir.iterdir()):
         if entry.is_file() and entry.suffix.lower() in exts:
             matches.append(entry)
     if len(matches) == 0:
-        raise InputError(f"No {kind} found in {song_dir}")
+        raise MissingInputError(f"No {kind} found in {song_dir}")
     if len(matches) > 1:
         names = ", ".join(m.name for m in matches)
-        raise InputError(f"Multiple {kind} files in {song_dir}: {names}")
+        raise AmbiguousInputError(f"Multiple {kind} files in {song_dir}: {names}")
     return matches[0]
 
 

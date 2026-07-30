@@ -50,21 +50,19 @@ def render(song_dir: Path, data: dict) -> list:
 
 
 def missing_for_stage(song_dir: Path, stage: str) -> list:
-    from .inputs import InputError, find_audio, find_image
+    from .inputs import AmbiguousInputError, MissingInputError, find_audio, find_image
 
+    finders = {AUDIO: find_audio, IMAGE: find_image}
     missing = []
     for requirement in STAGE_REQUIREMENTS.get(stage, []):
-        if requirement == AUDIO:
+        finder = finders.get(requirement)
+        if finder is not None:
             try:
-                find_audio(song_dir)
-            except InputError:
-                missing.append(AUDIO)
-            continue
-        if requirement == IMAGE:
-            try:
-                find_image(song_dir)
-            except InputError:
-                missing.append(IMAGE)
+                finder(song_dir)
+            except MissingInputError:
+                missing.append(requirement)
+            except AmbiguousInputError as err:
+                missing.append(str(err))
             continue
         if not (song_dir / requirement).exists():
             missing.append(requirement)

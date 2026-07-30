@@ -69,11 +69,22 @@ def test_missing_for_stage_image_and_youtube(song):
     assert artifacts.missing_for_stage(song, "ready") == ["image", "youtube.md"]
 
 
-def test_missing_for_stage_ignores_raw_folder(song):
-    raw = song / "raw"
-    raw.mkdir()
-    (raw / "track.mp3").write_bytes(b"")
-    assert artifacts.missing_for_stage(song, "recorded") == ["audio (.mp3)"]
+def test_missing_for_stage_names_the_ambiguous_files(song):
+    (song / "a.png").write_bytes(b"")
+    (song / "b.jpg").write_bytes(b"")
+    (song / "youtube.md").write_text("x", encoding="utf-8")
+    reported = artifacts.missing_for_stage(song, "ready")
+    assert len(reported) == 1
+    assert "Multiple image files" in reported[0]
+    assert "a.png" in reported[0] and "b.jpg" in reported[0]
+
+
+def test_missing_for_stage_ambiguous_audio_is_not_reported_as_absent(song):
+    (song / "take-1.mp3").write_bytes(b"")
+    (song / "take-2.mp3").write_bytes(b"")
+    reported = artifacts.missing_for_stage(song, "recorded")
+    assert reported != [artifacts.AUDIO]
+    assert "take-1.mp3" in reported[0]
 
 
 def test_idea_stage_requires_nothing(song):

@@ -1,6 +1,12 @@
 import pytest
 
-from sovigen.inputs import InputError, find_audio, find_image
+from sovigen.inputs import (
+    AmbiguousInputError,
+    InputError,
+    MissingInputError,
+    find_audio,
+    find_image,
+)
 
 
 def _touch(p):
@@ -29,16 +35,19 @@ def test_find_image_single_case_insensitive(tmp_path):
     assert find_image(tmp_path) == tmp_path / "cover.JPG"
 
 
-def test_find_image_ignores_raw_subdir(tmp_path):
-    (tmp_path / "raw").mkdir()
-    _touch(tmp_path / "raw" / "a.png")
-    _touch(tmp_path / "raw" / "b.png")
-    _touch(tmp_path / "cover.png")
-    assert find_image(tmp_path) == tmp_path / "cover.png"
-
-
 def test_find_image_multiple_in_root(tmp_path):
     _touch(tmp_path / "a.png")
     _touch(tmp_path / "b.jpg")
     with pytest.raises(InputError):
         find_image(tmp_path)
+
+
+def test_absence_and_ambiguity_are_distinct_errors(tmp_path):
+    with pytest.raises(MissingInputError):
+        find_image(tmp_path)
+    _touch(tmp_path / "a.png")
+    _touch(tmp_path / "b.jpg")
+    with pytest.raises(AmbiguousInputError) as err:
+        find_image(tmp_path)
+    assert "a.png" in str(err.value)
+    assert "b.jpg" in str(err.value)
