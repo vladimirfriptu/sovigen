@@ -80,7 +80,10 @@ def cmd_build_all() -> list:
         sdir = paths.song_dir(slug)
         if not meta_mod.has_meta(sdir):
             continue
-        data = meta_mod.read_meta(sdir)
+        try:
+            data = meta_mod.read_meta(sdir)
+        except (ValueError, OSError):
+            continue
         if data.get("stage") == "ready":
             cmd_build(slug)
             built.append(slug)
@@ -89,8 +92,16 @@ def cmd_build_all() -> list:
 
 def cmd_advance(slug: str) -> tuple:
     sdir = _require_song(slug)
-    data = meta_mod.read_meta(sdir)
-    current = data["stage"]
+    data = _read_meta_or_fail(slug, sdir)
+    current = data.get("stage")
+    if current not in meta_mod.STAGES:
+        known = ", ".join(meta_mod.STAGES)
+        raise CommandError(
+            f"unknown stage {current!r} in {slug}/meta.json; expected one of: {known}"
+        )
+    # Legacy songs predate the templates, so give them their scaffolding before
+    # asking which artifact is missing. render() leaves existing files alone.
+    artifacts.render(sdir, data)
     target = meta_mod.next_stage(current)
     if target is None:
         return (current, current)
@@ -183,7 +194,13 @@ def cmd_status() -> list:
         sdir = paths.song_dir(slug)
         row = {"slug": slug, "stage": "?", "title": slug, "turn": "-"}
         if meta_mod.has_meta(sdir):
-            data = meta_mod.read_meta(sdir)
+            try:
+                data = meta_mod.read_meta(sdir)
+            except (ValueError, OSError) as err:
+                row["stage"] = "unreadable"
+                row["error"] = str(err)
+                rows.append(row)
+                continue
             row["stage"] = data.get("stage", "?")
             row["title"] = data.get("title", slug)
             row["turn"] = TURN_BY_STAGE.get(row["stage"], "-")

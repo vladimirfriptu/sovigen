@@ -152,10 +152,71 @@ def test_advance_moves_to_next_stage(lib):
 
 
 def test_advance_refuses_without_required_file(lib):
-    _make_song(lib, "s", stage="idea", with_inputs=False)
+    _make_song(lib, "s", stage="recorded", with_inputs=False)
+    (lib / "s" / "track.mp3").write_bytes(b"")
     with pytest.raises(commands.CommandError) as err:
         commands.cmd_advance("s")
-    assert "missing: brief.md" in str(err.value)
+    assert "missing: image" in str(err.value)
+
+
+def test_advance_renders_missing_scaffolding(lib):
+    sdir = _make_song(lib, "legacy", stage="idea", with_inputs=False)
+    assert not (sdir / "brief.md").exists()
+    assert commands.cmd_advance("legacy") == ("idea", "brief")
+    assert (sdir / "brief.md").is_file()
+
+
+def test_advance_keeps_existing_artifact_text(lib):
+    sdir = _make_song(lib, "legacy", stage="idea", with_inputs=False)
+    (sdir / "brief.md").write_text("мой бриф", encoding="utf-8")
+    commands.cmd_advance("legacy")
+    assert (sdir / "brief.md").read_text(encoding="utf-8") == "мой бриф"
+
+
+def test_advance_reports_ambiguous_image_instead_of_absent(lib):
+    sdir = _make_song(lib, "s", stage="recorded", with_inputs=False)
+    (sdir / "track.mp3").write_bytes(b"")
+    (sdir / "a.png").write_bytes(b"")
+    (sdir / "b.jpg").write_bytes(b"")
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_advance("s")
+    message = str(err.value)
+    assert "a.png" in message and "b.jpg" in message
+
+
+def test_advance_on_unknown_stage_is_a_command_error(lib):
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    data = meta.read_meta(sdir)
+    data["stage"] = "mastering"
+    meta.write_meta(sdir, data)
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_advance("s")
+    assert "mastering" in str(err.value)
+
+
+def test_advance_on_unreadable_meta_is_a_command_error(lib):
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    (sdir / "meta.json").write_text("", encoding="utf-8")
+    with pytest.raises(commands.CommandError):
+        commands.cmd_advance("s")
+
+
+def test_status_survives_one_unreadable_meta(lib):
+    _make_song(lib, "good", stage="ready")
+    broken = _make_song(lib, "broken", stage="idea", with_inputs=False)
+    (broken / "meta.json").write_text("", encoding="utf-8")
+    rows = {row["slug"]: row for row in commands.cmd_status()}
+    assert rows["good"]["stage"] == "ready"
+    assert rows["broken"]["stage"] == "unreadable"
+    assert "error" in rows["broken"]
+
+
+def test_build_all_skips_unreadable_meta(lib, monkeypatch):
+    _make_song(lib, "ready-one", stage="ready")
+    broken = _make_song(lib, "broken", stage="idea", with_inputs=False)
+    (broken / "meta.json").write_text("{oops", encoding="utf-8")
+    _fake_ffmpeg_ok(monkeypatch)
+    assert commands.cmd_build_all() == ["ready-one"]
 
 
 def test_advance_at_final_stage_is_idempotent(lib):

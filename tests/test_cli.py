@@ -99,6 +99,54 @@ def test_reimport_then_advance_does_not_lose_the_previous_take(lib, tmp_path):
 
 def test_advance_missing_file_exits_nonzero(lib, capsys):
     sdir = commands.cmd_new("Мій щит")
-    (sdir / "brief.md").unlink()
+    meta.set_stage(sdir, "prompted", "2026-06-22")
     assert cli.main(["advance", "мій-щит"]) == 1
-    assert "missing: brief.md" in capsys.readouterr().err
+    assert "missing: audio (.mp3)" in capsys.readouterr().err
+
+
+def test_import_then_advance_walks_the_whole_pipeline(lib, tmp_path, monkeypatch,
+                                                      capsys):
+    def fake_run(cmd, capture_output=True, text=True):
+        open(cmd[-1], "wb").close()
+
+        class R:
+            returncode = 0
+            stderr = ""
+
+        return R()
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    assert main(["new", "Flow Song"]) == 0
+    sdir = lib / "flow-song"
+    for expected in ["brief", "lyrics", "prompted"]:
+        assert main(["advance", "flow-song"]) == 0
+        assert meta.read_meta(sdir)["stage"] == expected
+
+    take = tmp_path / "Suno v5 take 2.mp3"
+    take.write_bytes(b"audio")
+    assert main(["import", "flow-song", str(take)]) == 0
+    assert main(["advance", "flow-song"]) == 0
+    assert meta.read_meta(sdir)["stage"] == "recorded"
+
+    cover = tmp_path / "Gemini_Generated_Image.png"
+    cover.write_bytes(b"img")
+    assert main(["import", "flow-song", str(cover)]) == 0
+    assert main(["advance", "flow-song"]) == 0
+    assert meta.read_meta(sdir)["stage"] == "ready"
+
+    assert main(["build", "flow-song"]) == 0
+    assert (sdir / "youtube.mp4").exists()
+    assert meta.read_meta(sdir)["stage"] == "pre-published"
+    assert main(["publish", "flow-song"]) == 0
+    assert meta.read_meta(sdir)["stage"] == "published"
+
+
+def test_status_json_reports_broken_song_without_dying(lib, capsys):
+    commands.cmd_new("Good One")
+    broken = commands.cmd_new("Bad One")
+    (broken / "meta.json").write_text("", encoding="utf-8")
+    assert cli.main(["status", "--json"]) == 0
+    payload = {row["slug"]: row for row in json.loads(capsys.readouterr().out)}
+    assert payload["good-one"]["stage"] == "idea"
+    assert payload["bad-one"]["stage"] == "unreadable"
