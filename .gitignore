@@ -5,15 +5,14 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 
-# Медиа песен: тяжёлое и невоспроизводимое из репозитория.
-# Тексты, meta.json и md-артефакты — коммитятся.
-library/**/*.mp3
-library/**/*.wav
-library/**/*.mp4
-library/**/*.png
-library/**/*.jpg
-library/**/*.jpeg
-library/**/*.webp
+# Репозиторий публичный, а медиа песен тяжёлые и невоспроизводимые.
+# Поэтому whitelist: игнорируем в library/ всё, кроме текстов и meta.json.
+# Перечислять расширения нельзя — на Linux (core.ignorecase=false) любой
+# cover.JPG или новый .m4a утёк бы в коммит.
+library/**
+!library/**/
+!library/**/*.md
+!library/**/meta.json
 library/**/raw/
 
 # AI-конфиги провайдеров
