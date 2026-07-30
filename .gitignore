@@ -5,8 +5,16 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 
-# песни и все результаты (обложки, mp3, готовые видео) — только локально
-library/
+# Медиа песен: тяжёлое и невоспроизводимое из репозитория.
+# Тексты, meta.json и md-артефакты — коммитятся.
+library/**/*.mp3
+library/**/*.wav
+library/**/*.mp4
+library/**/*.png
+library/**/*.jpg
+library/**/*.jpeg
+library/**/*.webp
+library/**/raw/
 
-# AI-конфиги провайдеров (по политике компании не коммитим)
+# AI-конфиги провайдеров
 .claude/

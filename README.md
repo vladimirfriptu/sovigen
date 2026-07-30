@@ -1,17 +1,22 @@
 # sovigen — конвейер релиза песен на YouTube
 
-Инструмент собирает готовое видео для YouTube из **обложки** (картинка) и
-**песни** (mp3): картинка вписывается в кадр 1920×1080, поверх ложится
-аудио, на выходе — `youtube.mp4`.
+Инструмент ведёт песню через восемь стадий — от идеи до публикации — и
+на последнем шаге собирает готовое видео для YouTube из **обложки**
+(картинка) и **песни** (mp3): картинка вписывается в кадр 1920×1080,
+поверх ложится аудио, на выходе — `youtube.mp4`.
 
 Каждая песня — это постоянная папка `library/<slug>/`, а её состояние
 хранится прямо рядом, в `meta.json` (поле `stage`). Никакой БД и внешних
-сервисов: весь стейт — это файлы на диске. Поэтому конвейер переносится
-между машинами простым копированием папки песни.
+сервисов: весь стейт — это файлы на диске.
 
-> В репозитории лежит **только код и описание пайплайна**. Сама библиотека
-> песен (`library/`) — обложки, mp3, готовые видео — игнорируется гитом и
-> живёт локально на каждой машине.
+> **Что коммитится, а что нет.** Текст песни — `meta.json`, `brief.md`,
+> `lyrics.md`, `suno.md`, `cover-prompt.md`, `youtube.md`, `notes.md` —
+> версионируется в гите: у него есть история, и он приезжает на любую
+> машину простым `git pull`. Медиа — `track.mp3`, `cover.*`,
+> `youtube.mp4` — и черновая свалка `raw/` в гит не попадают
+> (см. `.gitignore`): они тяжёлые и раздули бы публичный репозиторий.
+> Долговременное хранение медиа — открытый вопрос, решения пока нет,
+> отслеживается в issue [#1](https://github.com/vladimirfriptu/sovigen/issues/1).
 
 ## Что нужно установить
 
@@ -44,82 +49,118 @@ just setup          # создаёт .venv и ставит pytest
 python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 ```
 
-Папка `library/` создаётся автоматически при первой команде `new` — держать
-её в репозитории не нужно.
+`git clone` уже принесёт `library/` с текстами всех существующих песен
+(без медиа) — докачивать mp3/обложки/видео для уже опубликованных треков
+не нужно, они появляются заново только для новой песни.
 
 ## Как устроен пайплайн
 
-Жизненный цикл песни описывается стадиями в `meta.json`:
+Жизненный цикл песни — восемь стадий в `meta.json`:
 
 ```
-draft ──► ready ──► pre-published ──► published
+idea → brief → lyrics → prompted → recorded → ready → pre-published → published
 ```
 
-| Стадия | Что означает |
-|--------|--------------|
-| `draft` | папка создана, файлы ещё отбираются |
-| `ready` | обложка и mp3 отобраны, можно собирать |
-| `pre-published` | `youtube.mp4` собран, ждёт заливки на YouTube |
-| `published` | видео залито на YouTube |
+| Стадия | Что означает | Чей ход |
+|--------|--------------|---------|
+| `idea` | папка создана, тема ещё не сформулирована | Claude |
+| `brief` | `brief.md` написан — о чём песня | Claude |
+| `lyrics` | `lyrics.md` готов — финальный текст | Claude |
+| `prompted` | `suno.md` готов — промпт для Suno | вы (сгенерировать в Suno) |
+| `recorded` | трек скачан и лежит в папке как `track.mp3` | Claude |
+| `ready` | обложка и `youtube.md` готовы, можно собирать видео | Claude |
+| `pre-published` | `youtube.mp4` собран | вы (залить на YouTube) |
+| `published` | видео опубликовано | — |
+
+Переход между стадиями делает команда `advance`: она проверяет, что для
+следующей стадии есть все нужные файлы, и только тогда двигает `stage`
+вперёд. Стадии `prompted` и `pre-published` — это стадии, где ход за
+человеком (сгенерировать в Suno, залить на YouTube); во всех остальных
+следующий шаг делает Claude.
 
 Внутри папки песни:
 
 ```
 library/<slug>/
-  meta.json                 # стейт: title, slug, stage, created
-  cover.jpg | cover.png     # ровно одна обложка (.jpg/.jpeg/.png/.webp)
-  track.mp3                 # ровно один аудиофайл (.mp3)
-  raw/                      # свалка черновых вариантов — пайплайном игнорируется
-  youtube.mp4               # результат сборки (после build)
+  meta.json                 # стейт: title, slug, stage, source, series, language, created, stage_history
+  brief.md                  # бриф: о чём песня
+  lyrics.md                 # финальный текст песни
+  suno.md                   # промпт для генерации в Suno
+  cover-prompt.md           # промпт для генерации обложки
+  youtube.md                # заголовок/описание для YouTube
+  notes.md                  # свободные заметки
+  raw/                      # черновая свалка (старые версии файлов, не в гите)
+  cover.jpg | cover.png     # ровно одна обложка (.jpg/.jpeg/.png/.webp) — не в гите
+  track.mp3                 # аудиофайл — не в гите
+  youtube.mp4               # результат сборки (после build) — не в гите
 ```
 
 Сборка (`build`) требует в корне папки **ровно один** аудиофайл и **ровно
-одну** картинку; лишние варианты складывай в `raw/`, иначе пайплайн честно
-откажется угадывать и попросит навести порядок.
+одну** картинку; лишние варианты складывай в `raw/` (это же делает
+`import` автоматически), иначе пайплайн честно откажется угадывать и
+попросит навести порядок.
 
-## Рабочий процесс (через just)
+## Команды
 
 ```bash
-just new "My Track Name"    # создаёт library/my-track-name (stage=draft)
-                            # → положи обложку и track.mp3 в папку песни
+just new "My Track Name"           # создаёт library/my-track-name (stage=idea)
+                                   # поддерживает --source, --series, --language
 
-just ready my-track-name    # stage → ready, когда файлы отобраны
-just build my-track-name    # собирает youtube.mp4, stage → pre-published
-just build-all              # собирает все песни со stage=ready
+just advance my-track-name         # двигает песню на следующую стадию,
+                                   # если для неё готовы нужные файлы
+
+just import my-track ~/Downloads/take.mp3
+                                   # кладёт скачанный файл в папку песни под
+                                   # каноническим именем (track.mp3 / cover.*),
+                                   # прошлый файл того же типа уходит в raw/
+
+just build my-track-name           # собирает youtube.mp4, stage → pre-published
+just build-all                     # собирает все песни со stage=ready
 
 # залей youtube.mp4 на YouTube, затем:
-just publish my-track-name  # stage → published
+just publish my-track-name         # stage → published
 
-just status                 # таблица всех песен и их стадий
+just status                        # таблица всех песен, их стадий и чьего хода ждём
+just status --json                 # то же самое в JSON
 ```
+
+Старой команды `ready` больше нет — её заменил `advance`, который сам
+проверяет готовность и двигает песню по всем восьми стадиям, а не только
+в `ready`.
 
 ## Те же команды без just
 
 `just` — это лишь тонкая обёртка над Python-модулем. Всё то же самое:
 
 ```bash
-python3 -m sovigen.cli new "My Track Name"
-python3 -m sovigen.cli ready my-track-name
+python3 -m sovigen.cli new "My Track Name" [--source ...] [--series ...] [--language uk]
+python3 -m sovigen.cli advance my-track-name
+python3 -m sovigen.cli import my-track-name ~/Downloads/take.mp3
 python3 -m sovigen.cli build my-track-name
 python3 -m sovigen.cli build-all
 python3 -m sovigen.cli publish my-track-name
-python3 -m sovigen.cli status
+python3 -m sovigen.cli status [--json]
 ```
 
 ## Структура кода
 
 ```
 sovigen/
-  cli.py         # разбор аргументов и точка входа (argparse)
-  commands.py    # логика команд new/build/build-all/ready/publish/status
-  ffmpegcmd.py   # сборка ffmpeg-команды для статичного видео
-  inputs.py      # поиск ровно одного аудио и одной картинки в папке
-  meta.py        # чтение/запись meta.json и переходы по стадиям
-  paths.py       # расположение library/ и папок песен
-  slug.py        # slugify заголовка (Unicode-aware, сохраняет кириллицу)
-prompts/
-  nano-banana-cover.md   # базовый промпт для генерации обложки
-tests/           # pytest-сьют на каждый модуль
+  cli.py            # разбор аргументов и точка входа (argparse)
+  commands.py       # логика команд new/advance/import/build/build-all/publish/status
+  artifacts.py      # шаблоны md-артефактов и проверка готовности стадии
+  templates/         # шаблоны brief.md/lyrics.md/suno.md/cover-prompt.md/youtube.md/notes.md
+  ffmpegcmd.py      # сборка ffmpeg-команды для статичного видео
+  inputs.py         # поиск ровно одного аудио и одной картинки в папке
+  meta.py           # чтение/запись meta.json, восемь стадий, переходы
+  paths.py          # расположение library/ и папок песен
+  slug.py           # slugify заголовка (Unicode-aware, сохраняет кириллицу)
+library/
+  <slug>/           # одна папка на песню, см. выше
+knowledge/
+  # база знаний проекта (решения, ловушки) — заводится отдельной задачей,
+  # здесь просто зарезервировано место в структуре репозитория
+tests/              # pytest-сьют на каждый модуль
 ```
 
 ## Формат видео
@@ -128,13 +169,6 @@ tests/           # pytest-сьют на каждый модуль
 обрезается), `libx264` / `yuv420p`, аудио `aac 320k`, длительность = длине
 песни, `+faststart` для быстрой отдачи. Точная команда — в
 `sovigen/ffmpegcmd.py`.
-
-## Обложки
-
-Базовый промпт для генерации обложки (nano banana / Gemini image) лежит в
-[`prompts/nano-banana-cover.md`](prompts/nano-banana-cover.md). Главное —
-соблюсти 16:9 и безопасные отступы по краям; финальный кадр 1920×1080
-всё равно соберёт `build`.
 
 ## Переменные окружения
 
@@ -152,5 +186,7 @@ just test
 
 ## На будущее (вне MVP)
 
-Оживление обложки через Stable Video Diffusion + бесшовный луп/реверс —
-команды `animate` и `build --render` зарезервированы, но не реализованы.
+- Долговременное и воспроизводимое хранение медиа (mp3/обложки/видео) вне
+  гита — открытый вопрос, issue [#1](https://github.com/vladimirfriptu/sovigen/issues/1).
+- Оживление обложки через Stable Video Diffusion + бесшовный луп/реверс —
+  команды `animate` и `build --render` зарезервированы, но не реализованы.

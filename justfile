@@ -13,9 +13,13 @@ test:
 new title:
     {{python}} -m sovigen.cli new "{{title}}"
 
-# mark a song ready to build: just ready my-track-name
-ready slug:
-    {{python}} -m sovigen.cli ready "{{slug}}"
+# advance a song to the next stage: just advance my-track-name
+advance slug:
+    {{python}} -m sovigen.cli advance "{{slug}}"
+
+# place a downloaded file into the song folder: just import my-track ~/Downloads/take.mp3
+import slug path:
+    {{python}} -m sovigen.cli import "{{slug}}" "{{path}}"
 
 # build one song by slug: just build my-track-name
 build slug:
