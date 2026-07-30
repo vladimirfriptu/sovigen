@@ -49,6 +49,10 @@ def render(song_dir: Path, data: dict) -> list:
     return created
 
 
+def is_scaffolded(song_dir: Path) -> bool:
+    return any((song_dir / name).exists() for name in ARTIFACT_FILES)
+
+
 def missing_for_stage(song_dir: Path, stage: str) -> list:
     from .inputs import AmbiguousInputError, MissingInputError, find_audio, find_image
 

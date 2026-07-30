@@ -99,9 +99,12 @@ def cmd_advance(slug: str) -> tuple:
         raise CommandError(
             f"unknown stage {current!r} in {slug}/meta.json; expected one of: {known}"
         )
-    # Legacy songs predate the templates, so give them their scaffolding before
-    # asking which artifact is missing. render() leaves existing files alone.
-    artifacts.render(sdir, data)
+    # Legacy songs predate the templates and cmd_new refuses their slug, so
+    # nothing else can ever scaffold them. Only a song with no artifacts at all
+    # counts as never scaffolded: recreating a single deleted file would turn
+    # every .md stage gate into an empty template that always passes.
+    if not artifacts.is_scaffolded(sdir):
+        artifacts.render(sdir, data)
     target = meta_mod.next_stage(current)
     if target is None:
         return (current, current)

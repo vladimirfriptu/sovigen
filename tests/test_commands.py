@@ -2,7 +2,7 @@ import subprocess
 
 import pytest
 
-from sovigen import commands, meta
+from sovigen import artifacts, commands, meta
 
 
 @pytest.fixture
@@ -152,18 +152,30 @@ def test_advance_moves_to_next_stage(lib):
 
 
 def test_advance_refuses_without_required_file(lib):
-    _make_song(lib, "s", stage="recorded", with_inputs=False)
-    (lib / "s" / "track.mp3").write_bytes(b"")
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    (sdir / "lyrics.md").write_text("x", encoding="utf-8")
     with pytest.raises(commands.CommandError) as err:
         commands.cmd_advance("s")
-    assert "missing: image" in str(err.value)
+    assert "missing: brief.md" in str(err.value)
 
 
-def test_advance_renders_missing_scaffolding(lib):
+def test_advance_refuses_when_a_scaffolded_song_lost_its_artifact(lib):
+    sdir = _make_song(lib, "s", stage="brief", with_inputs=False)
+    artifacts.render(sdir, meta.read_meta(sdir))
+    (sdir / "lyrics.md").unlink()
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_advance("s")
+    assert "missing: lyrics.md" in str(err.value)
+    assert not (sdir / "lyrics.md").exists()
+    assert meta.read_meta(sdir)["stage"] == "brief"
+
+
+def test_advance_renders_scaffolding_for_a_never_scaffolded_song(lib):
     sdir = _make_song(lib, "legacy", stage="idea", with_inputs=False)
     assert not (sdir / "brief.md").exists()
     assert commands.cmd_advance("legacy") == ("idea", "brief")
-    assert (sdir / "brief.md").is_file()
+    for name in artifacts.ARTIFACT_FILES:
+        assert (sdir / name).is_file(), name
 
 
 def test_advance_keeps_existing_artifact_text(lib):

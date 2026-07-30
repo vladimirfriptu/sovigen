@@ -99,9 +99,10 @@ def test_reimport_then_advance_does_not_lose_the_previous_take(lib, tmp_path):
 
 def test_advance_missing_file_exits_nonzero(lib, capsys):
     sdir = commands.cmd_new("Мій щит")
-    meta.set_stage(sdir, "prompted", "2026-06-22")
+    (sdir / "brief.md").unlink()
     assert cli.main(["advance", "мій-щит"]) == 1
-    assert "missing: audio (.mp3)" in capsys.readouterr().err
+    assert "missing: brief.md" in capsys.readouterr().err
+    assert not (sdir / "brief.md").exists()
 
 
 def test_import_then_advance_walks_the_whole_pipeline(lib, tmp_path, monkeypatch,
@@ -119,7 +120,21 @@ def test_import_then_advance_walks_the_whole_pipeline(lib, tmp_path, monkeypatch
 
     assert main(["new", "Flow Song"]) == 0
     sdir = lib / "flow-song"
-    for expected in ["brief", "lyrics", "prompted"]:
+    # Strip the templates the human is supposed to replace, so each gate below
+    # is answered by real content rather than by the scaffolding.
+    written_by_hand = {
+        "brief": ("brief.md", "псалом 3, ночь и щит"),
+        "lyrics": ("lyrics.md", "[Verse 1]\nТы мой щит"),
+        "prompted": ("suno.md", "Style: worship ballad"),
+    }
+    for name, _ in written_by_hand.values():
+        (sdir / name).unlink()
+    (sdir / "youtube.md").unlink()
+
+    for expected, (name, text) in written_by_hand.items():
+        assert main(["advance", "flow-song"]) == 1
+        assert f"missing: {name}" in capsys.readouterr().err
+        (sdir / name).write_text(text, encoding="utf-8")
         assert main(["advance", "flow-song"]) == 0
         assert meta.read_meta(sdir)["stage"] == expected
 
@@ -132,6 +147,9 @@ def test_import_then_advance_walks_the_whole_pipeline(lib, tmp_path, monkeypatch
     cover = tmp_path / "Gemini_Generated_Image.png"
     cover.write_bytes(b"img")
     assert main(["import", "flow-song", str(cover)]) == 0
+    assert main(["advance", "flow-song"]) == 1
+    assert "missing: youtube.md" in capsys.readouterr().err
+    (sdir / "youtube.md").write_text("описание для ютуба", encoding="utf-8")
     assert main(["advance", "flow-song"]) == 0
     assert meta.read_meta(sdir)["stage"] == "ready"
 
