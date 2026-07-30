@@ -71,6 +71,32 @@ def test_advance_reports_transition(lib, capsys):
     assert "idea -> brief" in capsys.readouterr().out
 
 
+def test_import_of_a_file_already_in_the_song_folder_exits_nonzero(lib, capsys):
+    main(["new", "Legacy"])
+    sdir = lib / "legacy"
+    legacy = sdir / "Псалом 3.mp3"
+    legacy.write_bytes(b"legacy take")
+    assert main(["import", "legacy", str(legacy)]) == 1
+    assert legacy.read_bytes() == b"legacy take"
+    assert "already inside" in capsys.readouterr().err
+
+
+def test_reimport_then_advance_does_not_lose_the_previous_take(lib, tmp_path):
+    main(["new", "Retake"])
+    sdir = lib / "retake"
+    meta.set_stage(sdir, "prompted", "2026-06-22")
+    first = tmp_path / "v1.mp3"
+    first.write_bytes(b"v1")
+    second = tmp_path / "v2.mp3"
+    second.write_bytes(b"v2")
+    assert main(["import", "retake", str(first)]) == 0
+    assert main(["import", "retake", str(second)]) == 0
+    assert (sdir / "track.mp3").read_bytes() == b"v2"
+    assert (sdir / "raw" / "track.mp3").read_bytes() == b"v1"
+    assert main(["advance", "retake"]) == 0
+    assert meta.read_meta(sdir)["stage"] == "recorded"
+
+
 def test_advance_missing_file_exits_nonzero(lib, capsys):
     sdir = commands.cmd_new("Мій щит")
     (sdir / "brief.md").unlink()

@@ -237,3 +237,48 @@ def test_import_missing_source(lib, tmp_path):
     _make_song(lib, "s", stage="prompted", with_inputs=False)
     with pytest.raises(commands.CommandError):
         commands.cmd_import("s", tmp_path / "nope.mp3")
+
+
+def test_import_rejects_source_inside_song_folder_and_keeps_it(lib):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    legacy = sdir / "Псалом 3.mp3"
+    legacy.write_bytes(b"legacy take")
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_import("s", legacy)
+    assert "already inside" in str(err.value)
+    assert legacy.read_bytes() == b"legacy take"
+    assert list((sdir / "raw").iterdir()) == []
+
+
+def test_import_rejects_source_inside_raw_and_keeps_it(lib):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    stashed = sdir / "raw" / "old.mp3"
+    stashed.write_bytes(b"old take")
+    with pytest.raises(commands.CommandError):
+        commands.cmd_import("s", stashed)
+    assert stashed.read_bytes() == b"old take"
+
+
+def test_import_failed_copy_keeps_previous_take_in_place(lib, tmp_path, monkeypatch):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    (sdir / "track.mp3").write_bytes(b"old")
+    src = tmp_path / "new.mp3"
+    src.write_bytes(b"new")
+
+    def full_disk(source, destination, **kwargs):
+        raise OSError("No space left on device")
+
+    monkeypatch.setattr(commands.shutil, "copy2", full_disk)
+    with pytest.raises(commands.CommandError):
+        commands.cmd_import("s", src)
+    assert (sdir / "track.mp3").read_bytes() == b"old"
+    assert list((sdir / "raw").iterdir()) == []
+    assert [p.name for p in sdir.glob(".sovigen-import-*")] == []
+
+
+def test_import_leaves_no_staging_file_behind(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src = tmp_path / "take.mp3"
+    src.write_bytes(b"audio")
+    commands.cmd_import("s", src)
+    assert [p.name for p in sdir.glob(".sovigen-*")] == []

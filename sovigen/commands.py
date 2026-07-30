@@ -1,4 +1,5 @@
 import datetime
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -6,11 +7,10 @@ from pathlib import Path
 from . import artifacts
 from . import meta as meta_mod
 from . import paths
+from .artifacts import AUDIO_FILENAME, VIDEO_FILENAME
 from .ffmpegcmd import build_static_video_cmd
 from .inputs import AUDIO_EXTS, IMAGE_EXTS, find_audio, find_image
 from .slug import slugify
-
-OUTPUT_FILENAME = "youtube.mp4"
 
 
 class CommandError(Exception):
@@ -45,9 +45,9 @@ def cmd_new(title: str, *, source=None, series=None, language: str = "uk") -> Pa
 
 def cmd_build(slug: str) -> Path:
     sdir = _require_song(slug)
-    output = sdir / OUTPUT_FILENAME
+    output = sdir / VIDEO_FILENAME
     if output.exists():
-        raise CommandError(f"{OUTPUT_FILENAME} already exists for {slug}")
+        raise CommandError(f"{VIDEO_FILENAME} already exists for {slug}")
     image = find_image(sdir)
     audio = find_audio(sdir)
     cmd = build_static_video_cmd(image, audio, output)
@@ -99,15 +99,31 @@ def cmd_import(slug: str, src) -> Path:
     source = Path(src)
     if not source.is_file():
         raise CommandError(f"File not found: {source}")
+    song_root = sdir.resolve()
+    if song_root in source.resolve().parents:
+        raise CommandError(
+            f"{source} is already inside {sdir}; import only brings files in from "
+            "outside. Rename it by hand if it needs a canonical name."
+        )
     ext = source.suffix.lower()
     if ext in AUDIO_EXTS:
-        dest = sdir / "track.mp3"
+        dest = sdir / AUDIO_FILENAME
+        exts = AUDIO_EXTS
     elif ext in IMAGE_EXTS:
         dest = sdir / f"cover{ext}"
+        exts = IMAGE_EXTS
     else:
         raise CommandError(f"unsupported file type: {ext or source.name}")
-    _stash_existing(sdir, AUDIO_EXTS if ext in AUDIO_EXTS else IMAGE_EXTS)
-    shutil.copy2(source, dest)
+    # Copy first, stash second, rename last: a failed copy must leave the song
+    # untouched, and the partial file must never look like a media file.
+    staging = sdir / f".sovigen-import-{dest.name}.part"
+    try:
+        shutil.copy2(source, staging)
+        _stash_existing(sdir, exts)
+        os.replace(staging, dest)
+    except OSError as err:
+        staging.unlink(missing_ok=True)
+        raise CommandError(f"could not import {source} into {slug}: {err}") from err
     return dest
 
 
