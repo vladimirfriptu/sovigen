@@ -112,12 +112,12 @@ def test_build_ffmpeg_failure_keeps_stage(lib, monkeypatch):
 
 def test_build_all_only_ready(lib, monkeypatch):
     _make_song(lib, "ready-one", stage="ready")
-    _make_song(lib, "draft-one", stage="draft")
+    _make_song(lib, "idea-one", stage="idea")
     _fake_ffmpeg_ok(monkeypatch)
     built = commands.cmd_build_all()
     assert built == ["ready-one"]
     assert meta.read_meta(lib / "ready-one")["stage"] == "pre-published"
-    assert meta.read_meta(lib / "draft-one")["stage"] == "draft"
+    assert meta.read_meta(lib / "idea-one")["stage"] == "idea"
 
 
 def test_build_all_skips_dirs_without_meta(lib, monkeypatch):
@@ -126,15 +126,31 @@ def test_build_all_skips_dirs_without_meta(lib, monkeypatch):
     assert commands.cmd_build_all() == []
 
 
-def test_ready_sets_stage(lib):
-    _make_song(lib, "song-r", stage="draft")
-    commands.cmd_ready("song-r")
-    assert meta.read_meta(lib / "song-r")["stage"] == "ready"
+def test_advance_moves_to_next_stage(lib):
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    (sdir / "brief.md").write_text("x", encoding="utf-8")
+    assert commands.cmd_advance("s") == ("idea", "brief")
+    assert meta.read_meta(sdir)["stage"] == "brief"
 
 
-def test_ready_unknown_slug(lib):
-    with pytest.raises(commands.CommandError):
-        commands.cmd_ready("nope")
+def test_advance_refuses_without_required_file(lib):
+    _make_song(lib, "s", stage="idea", with_inputs=False)
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_advance("s")
+    assert "missing: brief.md" in str(err.value)
+
+
+def test_advance_at_final_stage_is_idempotent(lib):
+    _make_song(lib, "s", stage="published", with_inputs=False)
+    assert commands.cmd_advance("s") == ("published", "published")
+
+
+def test_advance_records_history(lib):
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    (sdir / "brief.md").write_text("x", encoding="utf-8")
+    commands.cmd_advance("s")
+    history = meta.read_meta(sdir)["stage_history"]
+    assert history[-1]["stage"] == "brief"
 
 
 def test_publish_sets_stage(lib):

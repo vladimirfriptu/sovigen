@@ -53,7 +53,7 @@ def cmd_build(slug: str) -> Path:
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise CommandError(f"ffmpeg failed for {slug}:\n{result.stderr}")
-    meta_mod.set_stage(sdir, "pre-published")
+    meta_mod.set_stage(sdir, "pre-published", datetime.date.today().isoformat())
     return output
 
 
@@ -70,14 +70,27 @@ def cmd_build_all() -> list:
     return built
 
 
-def cmd_ready(slug: str) -> None:
+def cmd_advance(slug: str) -> tuple:
     sdir = _require_song(slug)
-    meta_mod.set_stage(sdir, "ready")
+    data = meta_mod.read_meta(sdir)
+    current = data["stage"]
+    target = meta_mod.next_stage(current)
+    if target is None:
+        return (current, current)
+    missing = artifacts.missing_for_stage(sdir, target)
+    if missing:
+        raise CommandError(
+            f"cannot advance {slug} to {target}, missing: " + ", ".join(missing)
+        )
+    today = datetime.date.today().isoformat()
+    meta_mod.set_stage(sdir, target, today)
+    return (current, target)
 
 
 def cmd_publish(slug: str) -> None:
     sdir = _require_song(slug)
-    meta_mod.set_stage(sdir, "published")
+    today = datetime.date.today().isoformat()
+    meta_mod.set_stage(sdir, "published", today)
 
 
 def cmd_status() -> list:
