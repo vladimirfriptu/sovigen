@@ -33,6 +33,6 @@ build-all:
 publish slug:
     {{python}} -m sovigen.cli publish "{{slug}}"
 
-# show all songs and their stages
-status:
-    {{python}} -m sovigen.cli status
+# show all songs and their stages: just status [--json]
+status *args:
+    {{python}} -m sovigen.cli status {{args}}

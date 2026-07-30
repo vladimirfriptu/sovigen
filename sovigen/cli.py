@@ -47,7 +47,8 @@ def _dispatch(args) -> int:
             args.title, source=args.source, series=args.series, language=args.language
         )
         print(f"created {sdir}")
-        print("put cover.(jpg|png|webp) and track.mp3 inside, then set stage to 'ready'")
+        print("write brief.md, then: sovigen advance <slug> to move stage by stage")
+        print("bring downloads in with: sovigen import <slug> <path-to-file>")
         return 0
     if args.command == "build":
         out = commands.cmd_build(args.slug)

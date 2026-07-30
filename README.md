@@ -115,6 +115,7 @@ just import my-track ~/Downloads/take.mp3
                                    # прошлый файл того же типа уходит в raw/
 
 just build my-track-name           # собирает youtube.mp4, stage → pre-published
+                                   # требует, чтобы песня была на stage=ready
 just build-all                     # собирает все песни со stage=ready
 
 # залей youtube.mp4 на YouTube, затем:
