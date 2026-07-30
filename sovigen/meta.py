@@ -56,6 +56,10 @@ def read_meta(song_dir: Path) -> dict:
     path = meta_path(song_dir)
     text = path.read_text(encoding="utf-8")
     data = json.loads(text)
+    # Valid JSON that is not an object (null, 3, []) would blow up inside
+    # _normalize with a TypeError; every caller already guards ValueError.
+    if not isinstance(data, dict):
+        raise ValueError(f"{path} must contain a JSON object, got {type(data).__name__}")
     return _normalize(data)
 
 

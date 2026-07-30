@@ -223,6 +223,23 @@ def test_status_survives_one_unreadable_meta(lib):
     assert "error" in rows["broken"]
 
 
+@pytest.mark.parametrize("payload", ["null", "3", "[]", '"idea"'])
+def test_status_survives_meta_that_is_valid_json_but_not_an_object(lib, payload):
+    _make_song(lib, "good", stage="ready")
+    broken = _make_song(lib, "broken", stage="idea", with_inputs=False)
+    (broken / "meta.json").write_text(payload, encoding="utf-8")
+    rows = {row["slug"]: row for row in commands.cmd_status()}
+    assert rows["good"]["stage"] == "ready"
+    assert rows["broken"]["stage"] == "unreadable"
+
+
+def test_advance_on_meta_that_is_not_an_object_is_a_command_error(lib):
+    sdir = _make_song(lib, "s", stage="idea", with_inputs=False)
+    (sdir / "meta.json").write_text("null", encoding="utf-8")
+    with pytest.raises(commands.CommandError):
+        commands.cmd_advance("s")
+
+
 def test_build_all_skips_unreadable_meta(lib, monkeypatch):
     _make_song(lib, "ready-one", stage="ready")
     broken = _make_song(lib, "broken", stage="idea", with_inputs=False)
