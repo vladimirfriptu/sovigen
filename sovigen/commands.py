@@ -133,14 +133,27 @@ def _free_name(raw_dir: Path, name: str) -> Path:
         counter += 1
 
 
+TURN_BY_STAGE = {
+    "idea": "claude",
+    "brief": "claude",
+    "lyrics": "claude",
+    "prompted": "you",
+    "recorded": "claude",
+    "ready": "claude",
+    "pre-published": "you",
+    "published": "-",
+}
+
+
 def cmd_status() -> list:
     rows = []
     for slug in paths.list_song_slugs():
         sdir = paths.song_dir(slug)
-        row = {"slug": slug, "stage": "?", "title": slug}
+        row = {"slug": slug, "stage": "?", "title": slug, "turn": "-"}
         if meta_mod.has_meta(sdir):
             data = meta_mod.read_meta(sdir)
             row["stage"] = data.get("stage", "?")
             row["title"] = data.get("title", slug)
+            row["turn"] = TURN_BY_STAGE.get(row["stage"], "-")
         rows.append(row)
     return rows

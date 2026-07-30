@@ -162,7 +162,15 @@ def test_publish_sets_stage(lib):
 def test_status_lists_rows(lib):
     _make_song(lib, "song-e", stage="ready")
     rows = commands.cmd_status()
-    assert {"slug": "song-e", "stage": "ready", "title": "song-e"} in rows
+    assert {"slug": "song-e", "stage": "ready", "title": "song-e", "turn": "claude"} in rows
+
+
+def test_status_reports_turn(lib):
+    _make_song(lib, "a", stage="prompted", with_inputs=False)
+    _make_song(lib, "b", stage="lyrics", with_inputs=False)
+    _make_song(lib, "c", stage="published", with_inputs=False)
+    rows = {row["slug"]: row["turn"] for row in commands.cmd_status()}
+    assert rows == {"a": "you", "b": "claude", "c": "-"}
 
 
 def test_import_audio_to_canonical_name(lib, tmp_path):

@@ -1,4 +1,5 @@
 import argparse
+import json
 import sys
 
 from . import commands
@@ -10,19 +11,27 @@ def main(argv=None) -> int:
 
     p_new = sub.add_parser("new")
     p_new.add_argument("title")
+    p_new.add_argument("--source", default=None)
+    p_new.add_argument("--series", default=None)
+    p_new.add_argument("--language", default="uk")
 
     p_build = sub.add_parser("build")
     p_build.add_argument("slug")
 
     sub.add_parser("build-all")
 
-    p_ready = sub.add_parser("ready")
-    p_ready.add_argument("slug")
+    p_advance = sub.add_parser("advance")
+    p_advance.add_argument("slug")
+
+    p_import = sub.add_parser("import")
+    p_import.add_argument("slug")
+    p_import.add_argument("path")
 
     p_pub = sub.add_parser("publish")
     p_pub.add_argument("slug")
 
-    sub.add_parser("status")
+    p_status = sub.add_parser("status")
+    p_status.add_argument("--json", action="store_true")
 
     args = parser.parse_args(argv)
     try:
@@ -34,7 +43,9 @@ def main(argv=None) -> int:
 
 def _dispatch(args) -> int:
     if args.command == "new":
-        sdir = commands.cmd_new(args.title)
+        sdir = commands.cmd_new(
+            args.title, source=args.source, series=args.series, language=args.language
+        )
         print(f"created {sdir}")
         print("put cover.(jpg|png|webp) and track.mp3 inside, then set stage to 'ready'")
         return 0
@@ -49,9 +60,16 @@ def _dispatch(args) -> int:
         else:
             print("nothing to build (no songs at stage 'ready')")
         return 0
-    if args.command == "ready":
-        commands.cmd_ready(args.slug)
-        print(f"{args.slug} -> ready")
+    if args.command == "advance":
+        moved_from, moved_to = commands.cmd_advance(args.slug)
+        if moved_from == moved_to:
+            print(f"{args.slug} already at {moved_to}")
+        else:
+            print(f"{args.slug}: {moved_from} -> {moved_to}")
+        return 0
+    if args.command == "import":
+        dest = commands.cmd_import(args.slug, args.path)
+        print(f"imported {dest}")
         return 0
     if args.command == "publish":
         commands.cmd_publish(args.slug)
@@ -59,7 +77,10 @@ def _dispatch(args) -> int:
         return 0
     if args.command == "status":
         rows = commands.cmd_status()
-        _print_status(rows)
+        if args.json:
+            print(json.dumps(rows, ensure_ascii=False))
+        else:
+            _print_status(rows)
         return 0
     return 2
 
@@ -69,7 +90,7 @@ def _print_status(rows) -> None:
         print("no songs yet")
         return
     for row in rows:
-        print(f"{row['stage']:<14} {row['slug']}")
+        print(f"{row['stage']:<14} {row['turn']:<7} {row['slug']}")
 
 
 if __name__ == "__main__":
