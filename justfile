@@ -9,9 +9,9 @@ setup:
 test:
     .venv/bin/python -m pytest
 
-# create a new song folder: just new "My Track Name"
-new title:
-    {{python}} -m sovigen.cli new "{{title}}"
+# create a new song folder: just new "My Track Name" [--source ... --series ... --language ...]
+new title *args:
+    {{python}} -m sovigen.cli new "{{title}}" {{args}}
 
 # advance a song to the next stage: just advance my-track-name
 advance slug:
