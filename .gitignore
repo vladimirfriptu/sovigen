@@ -15,8 +15,8 @@ library/**
 !library/**/meta.json
 library/**/raw/
 
-# AI-конфиги провайдеров
-.claude/
+# Рабочая папка subagent-driven-development — временные отчёты и диффы
+.superpowers/
 
 # Obsidian vault settings
 .obsidian/
