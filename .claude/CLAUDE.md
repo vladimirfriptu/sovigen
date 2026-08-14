@@ -33,14 +33,12 @@ Context is finite; loading history that changes nothing wastes it.
 
 ### Writing back
 
-Two entry points, and nothing else writes to the base from here:
+One entry point, and nothing else writes to the base from here:
 
 - `/brain-note` — a decision or a trap caught mid-work. Fast, one file, no
   distillation.
-- the `harvesting-knowledge` skill — when a piece of work is finished and its
-  local artifacts (specs, plans, notes) are about to be deleted.
 
-Both only drop raw material into `$BRAIN/raw/inbox/`. **Never edit a card, the
+It only drops raw material into `$BRAIN/raw/inbox/`. **Never edit a card, the
 index, the journal or any other page of the base from this project** — the base
 distils its own material, with the whole base in context, and a session here
 cannot see what else a page has to agree with.
