@@ -8,9 +8,17 @@ from . import artifacts
 from . import meta as meta_mod
 from . import paths
 from .artifacts import AUDIO_FILENAME, VIDEO_FILENAME
-from .ffmpegcmd import build_static_video_cmd
+from .ffmpegcmd import (
+    build_spectrum_video_cmd,
+    build_static_video_cmd,
+    probe_duration_cmd,
+)
 from .inputs import AUDIO_EXTS, IMAGE_EXTS, find_audio, find_image
 from .slug import slugify
+
+
+VIDEO_STYLE_STATIC = "static"
+VIDEO_STYLE_SPECTRUM = "freqline"
 
 
 class CommandError(Exception):
@@ -52,7 +60,7 @@ def cmd_new(title: str, *, source=None, series=None, language: str = "uk") -> Pa
     return sdir
 
 
-def cmd_build(slug: str) -> Path:
+def cmd_build(slug: str, viz: bool = False) -> Path:
     sdir = _require_song(slug)
     data = _read_meta_or_fail(slug, sdir)
     stage = data.get("stage", "?")
@@ -66,12 +74,40 @@ def cmd_build(slug: str) -> Path:
         raise CommandError(f"{VIDEO_FILENAME} already exists for {slug}")
     image = find_image(sdir)
     audio = find_audio(sdir)
-    cmd = build_static_video_cmd(image, audio, output)
+    style = VIDEO_STYLE_SPECTRUM if viz else data.get("video_style", VIDEO_STYLE_STATIC)
+    if style == VIDEO_STYLE_SPECTRUM:
+        duration = _probe_duration(slug, audio)
+        cmd = build_spectrum_video_cmd(image, audio, output, duration)
+    else:
+        cmd = build_static_video_cmd(image, audio, output)
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise CommandError(f"ffmpeg failed for {slug}:\n{result.stderr}")
+    _remember_video_style(sdir, style)
     meta_mod.set_stage(sdir, "pre-published", datetime.date.today().isoformat())
     return output
+
+
+def _probe_duration(slug: str, audio: Path) -> float:
+    result = subprocess.run(
+        probe_duration_cmd(audio), capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        raise CommandError(f"could not read the length of {audio.name} for {slug}")
+    try:
+        return float(result.stdout.strip())
+    except ValueError:
+        raise CommandError(
+            f"ffprobe gave no usable duration for {audio.name}: {result.stdout!r}"
+        ) from None
+
+
+def _remember_video_style(song_dir: Path, style: str) -> None:
+    data = meta_mod.read_meta(song_dir)
+    if data.get("video_style") == style:
+        return
+    data["video_style"] = style
+    meta_mod.write_meta(song_dir, data)
 
 
 def cmd_build_all() -> list:

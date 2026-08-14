@@ -390,3 +390,78 @@ def test_import_leaves_no_staging_file_behind(lib, tmp_path):
     src.write_bytes(b"audio")
     commands.cmd_import("s", src)
     assert [p.name for p in sdir.glob(".sovigen-*")] == []
+
+
+def _fake_ffmpeg_and_ffprobe(monkeypatch, duration="217.0"):
+    calls = []
+
+    def fake_run(cmd, capture_output=True, text=True):
+        calls.append(cmd)
+
+        class R:
+            returncode = 0
+            stderr = ""
+            stdout = ""
+
+        if cmd[0] == "ffprobe":
+            R.stdout = duration + "\n"
+            return R
+        open(cmd[-1], "wb").close()
+        return R
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    return calls
+
+
+def test_build_without_viz_stays_a_still_image(lib, monkeypatch):
+    _make_song(lib, "plain", stage="ready")
+    calls = _fake_ffmpeg_and_ffprobe(monkeypatch)
+    commands.cmd_build("plain")
+    assert all(cmd[0] != "ffprobe" for cmd in calls)
+    assert "showfreqs" not in " ".join(calls[0])
+    assert meta.read_meta(lib / "plain").get("video_style", "static") == "static"
+
+
+def test_build_with_viz_draws_the_spectrum_line(lib, monkeypatch):
+    _make_song(lib, "lively", stage="ready")
+    calls = _fake_ffmpeg_and_ffprobe(monkeypatch)
+    commands.cmd_build("lively", viz=True)
+    ffmpeg_cmd = [cmd for cmd in calls if cmd[0] == "ffmpeg"][0]
+    joined = " ".join(ffmpeg_cmd)
+    assert "showfreqs" in joined
+    assert "217.0" in joined
+
+
+def test_build_with_viz_remembers_the_choice(lib, monkeypatch):
+    _make_song(lib, "remembered", stage="ready")
+    _fake_ffmpeg_and_ffprobe(monkeypatch)
+    commands.cmd_build("remembered", viz=True)
+    assert meta.read_meta(lib / "remembered")["video_style"] == "freqline"
+
+
+def test_rebuild_follows_the_remembered_style(lib, monkeypatch):
+    sdir = _make_song(lib, "again", stage="ready")
+    _fake_ffmpeg_and_ffprobe(monkeypatch)
+    commands.cmd_build("again", viz=True)
+    (sdir / "youtube.mp4").unlink()
+    meta.set_stage(sdir, "ready", "2026-08-14")
+    calls = _fake_ffmpeg_and_ffprobe(monkeypatch)
+    commands.cmd_build("again")
+    assert "showfreqs" in " ".join([cmd for cmd in calls if cmd[0] == "ffmpeg"][0])
+
+
+def test_build_fails_when_duration_is_unreadable(lib, monkeypatch):
+    _make_song(lib, "broken", stage="ready")
+
+    def fake_run(cmd, capture_output=True, text=True):
+        class R:
+            returncode = 1 if cmd[0] == "ffprobe" else 0
+            stderr = "no such stream"
+            stdout = ""
+
+        return R
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+    with pytest.raises(commands.CommandError):
+        commands.cmd_build("broken", viz=True)
+    assert meta.read_meta(lib / "broken")["stage"] == "ready"

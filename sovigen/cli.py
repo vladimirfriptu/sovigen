@@ -17,6 +17,7 @@ def main(argv=None) -> int:
 
     p_build = sub.add_parser("build")
     p_build.add_argument("slug")
+    p_build.add_argument("--viz", action="store_true")
 
     sub.add_parser("build-all")
 
@@ -51,7 +52,7 @@ def _dispatch(args) -> int:
         print("bring downloads in with: sovigen import <slug> <path-to-file>")
         return 0
     if args.command == "build":
-        out = commands.cmd_build(args.slug)
+        out = commands.cmd_build(args.slug, viz=args.viz)
         print(f"built {out}")
         return 0
     if args.command == "build-all":

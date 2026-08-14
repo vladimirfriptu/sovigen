@@ -21,9 +21,9 @@ advance slug:
 import slug path:
     {{python}} -m sovigen.cli import "{{slug}}" "{{path}}"
 
-# build one song by slug: just build my-track-name
-build slug:
-    {{python}} -m sovigen.cli build "{{slug}}"
+# build one song by slug: just build my-track-name [--viz]
+build slug *args:
+    {{python}} -m sovigen.cli build "{{slug}}" {{args}}
 
 # build every song at stage 'ready'
 build-all:
