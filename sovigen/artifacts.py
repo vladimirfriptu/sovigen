@@ -26,7 +26,37 @@ STAGE_REQUIREMENTS = {
     "published": [],
 }
 
+VARIANTS_DIRNAME = "variants"
+
+# Only these two fan out into variants/<id>/. The cover, the YouTube metadata
+# and the notes belong to the song, not to one reading of it.
+FANOUT_FILES = ("lyrics.md", "suno.md")
+
 _TEMPLATES_DIR = Path(__file__).parent / "templates"
+
+
+def variants_dir(song_dir: Path) -> Path:
+    return song_dir / VARIANTS_DIRNAME
+
+
+def variant_dir(song_dir: Path, variant_id: str) -> Path:
+    return variants_dir(song_dir) / variant_id
+
+
+def variant_ids(song_dir: Path) -> list:
+    base = variants_dir(song_dir)
+    if not base.is_dir():
+        return []
+    return sorted(entry.name for entry in base.iterdir() if entry.is_dir())
+
+
+def _fanout_present(song_dir: Path, name: str) -> bool:
+    if (song_dir / name).exists():
+        return True
+    return any(
+        (variant_dir(song_dir, variant_id) / name).exists()
+        for variant_id in variant_ids(song_dir)
+    )
 
 
 def render(song_dir: Path, data: dict) -> list:
@@ -67,6 +97,12 @@ def missing_for_stage(song_dir: Path, stage: str) -> list:
                 missing.append(requirement)
             except AmbiguousInputError as err:
                 missing.append(str(err))
+            continue
+        if requirement in FANOUT_FILES:
+            # The plain name is reported either way: callers parse
+            # "missing: lyrics.md" and must not learn a second vocabulary.
+            if not _fanout_present(song_dir, requirement):
+                missing.append(requirement)
             continue
         if not (song_dir / requirement).exists():
             missing.append(requirement)

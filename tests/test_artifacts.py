@@ -89,3 +89,47 @@ def test_missing_for_stage_ambiguous_audio_is_not_reported_as_absent(song):
 
 def test_idea_stage_requires_nothing(song):
     assert artifacts.missing_for_stage(song, "idea") == []
+
+
+def test_variant_ids_empty_without_variants_dir(song):
+    assert artifacts.variant_ids(song) == []
+
+
+def test_variant_ids_sorted(song):
+    for name in ("c", "a", "b"):
+        (song / "variants" / name).mkdir(parents=True)
+    assert artifacts.variant_ids(song) == ["a", "b", "c"]
+
+
+def test_variant_ids_ignores_files(song):
+    (song / "variants").mkdir()
+    (song / "variants" / "notes.txt").write_text("x", encoding="utf-8")
+    assert artifacts.variant_ids(song) == []
+
+
+def test_lyrics_requirement_satisfied_by_a_variant(song):
+    (song / "variants" / "a").mkdir(parents=True)
+    (song / "variants" / "a" / "lyrics.md").write_text("текст", encoding="utf-8")
+    assert artifacts.missing_for_stage(song, "lyrics") == []
+
+
+def test_suno_requirement_satisfied_by_a_variant(song):
+    (song / "variants" / "b").mkdir(parents=True)
+    (song / "variants" / "b" / "suno.md").write_text("Style", encoding="utf-8")
+    assert artifacts.missing_for_stage(song, "prompted") == []
+
+
+def test_lyrics_requirement_still_satisfied_by_the_root_file(song):
+    (song / "lyrics.md").write_text("текст", encoding="utf-8")
+    assert artifacts.missing_for_stage(song, "lyrics") == []
+
+
+def test_lyrics_missing_reports_the_plain_name(song):
+    (song / "variants" / "a").mkdir(parents=True)
+    assert artifacts.missing_for_stage(song, "lyrics") == ["lyrics.md"]
+
+
+def test_brief_requirement_is_not_fanned_out(song):
+    (song / "variants" / "a").mkdir(parents=True)
+    (song / "variants" / "a" / "brief.md").write_text("концепт", encoding="utf-8")
+    assert artifacts.missing_for_stage(song, "brief") == ["brief.md"]
