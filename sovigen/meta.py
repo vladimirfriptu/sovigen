@@ -3,7 +3,7 @@ import os
 import tempfile
 from pathlib import Path
 
-META_VERSION = 2
+META_VERSION = 3
 META_FILENAME = "meta.json"
 
 STAGES = [
@@ -39,6 +39,8 @@ def new_meta(
         "series": series,
         "language": language,
         "style": None,
+        "variants": [],
+        "chosen_variant": None,
         "suno_takes": 0,
         "stage_history": [{"stage": "idea", "at": created}],
     }
@@ -72,6 +74,8 @@ def _normalize(data: dict) -> dict:
     normalized.setdefault("series", None)
     normalized.setdefault("language", "uk")
     normalized.setdefault("style", None)
+    normalized.setdefault("variants", [])
+    normalized.setdefault("chosen_variant", None)
     normalized.setdefault("suno_takes", 0)
     normalized.setdefault("stage_history", [])
     normalized["meta_version"] = META_VERSION

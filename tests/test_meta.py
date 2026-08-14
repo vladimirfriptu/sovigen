@@ -8,7 +8,7 @@ from sovigen import meta
 def test_new_meta_shape():
     data = meta.new_meta("My Song", "my-song", "2026-07-30")
     assert data == {
-        "meta_version": 2,
+        "meta_version": 3,
         "title": "My Song",
         "slug": "my-song",
         "stage": "idea",
@@ -17,9 +17,35 @@ def test_new_meta_shape():
         "series": None,
         "language": "uk",
         "style": None,
+        "variants": [],
+        "chosen_variant": None,
         "suno_takes": 0,
         "stage_history": [{"stage": "idea", "at": "2026-07-30"}],
     }
+
+
+def test_new_meta_carries_variant_fields():
+    data = meta.new_meta("My Song", "my-song", "2026-08-14")
+    assert data["meta_version"] == 3
+    assert data["variants"] == []
+    assert data["chosen_variant"] is None
+
+
+def test_read_meta_backfills_variant_fields_on_v2(tmp_path):
+    legacy = {
+        "meta_version": 2,
+        "title": "Old Song",
+        "slug": "old-song",
+        "stage": "prompted",
+        "created": "2026-07-30",
+    }
+    (tmp_path / "meta.json").write_text(
+        json.dumps(legacy, ensure_ascii=False), encoding="utf-8"
+    )
+    data = meta.read_meta(tmp_path)
+    assert data["variants"] == []
+    assert data["chosen_variant"] is None
+    assert data["meta_version"] == 3
 
 
 def test_write_then_read_roundtrip(tmp_path):
@@ -45,7 +71,7 @@ def test_read_normalizes_v1_draft_to_idea(tmp_path):
     (tmp_path / "meta.json").write_text(json.dumps(legacy), encoding="utf-8")
     data = meta.read_meta(tmp_path)
     assert data["stage"] == "idea"
-    assert data["meta_version"] == 2
+    assert data["meta_version"] == 3
     assert data["stage_history"] == []
 
 

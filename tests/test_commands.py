@@ -43,7 +43,7 @@ def test_new_creates_structure(lib):
     assert (sdir / "meta.json").is_file()
     data = meta.read_meta(sdir)
     assert data["stage"] == "idea"
-    assert data["meta_version"] == 2
+    assert data["meta_version"] == 3
 
 
 def test_new_renders_artifacts(lib):
