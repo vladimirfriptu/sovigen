@@ -154,6 +154,39 @@ def cmd_advance(slug: str) -> tuple:
     return (current, target)
 
 
+def cmd_choose(slug: str, variant_id: str) -> Path:
+    sdir = _require_song(slug)
+    data = _read_meta_or_fail(slug, sdir)
+    vdir = artifacts.variant_dir(sdir, variant_id)
+    if not vdir.is_dir():
+        available = ", ".join(artifacts.variant_ids(sdir)) or "(none)"
+        raise CommandError(f"unknown variant: {variant_id}. Available: {available}")
+    missing = [
+        f"{artifacts.VARIANTS_DIRNAME}/{variant_id}/{name}"
+        for name in artifacts.FANOUT_FILES
+        if not (vdir / name).exists()
+    ]
+    if missing:
+        raise CommandError("missing: " + ", ".join(missing))
+    for name in artifacts.FANOUT_FILES:
+        shutil.copy2(vdir / name, sdir / name)
+    data["chosen_variant"] = variant_id
+    style = _variant_style(data, variant_id)
+    if style is not None:
+        data["style"] = style
+    meta_mod.write_meta(sdir, data)
+    return vdir
+
+
+def _variant_style(data: dict, variant_id: str):
+    # A variant nobody listed in meta.json still gets promoted; the top-level
+    # style just stays whatever it was, rather than being blanked.
+    for entry in data.get("variants", []):
+        if isinstance(entry, dict) and entry.get("id") == variant_id:
+            return entry.get("style")
+    return None
+
+
 def cmd_publish(slug: str) -> None:
     sdir = _require_song(slug)
     today = datetime.date.today().isoformat()

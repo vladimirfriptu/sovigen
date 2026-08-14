@@ -465,3 +465,82 @@ def test_build_fails_when_duration_is_unreadable(lib, monkeypatch):
     with pytest.raises(commands.CommandError):
         commands.cmd_build("broken", viz=True)
     assert meta.read_meta(lib / "broken")["stage"] == "ready"
+
+
+def _make_variant(sdir, variant_id, *, lyrics="текст", suno="Style"):
+    vdir = sdir / "variants" / variant_id
+    vdir.mkdir(parents=True)
+    if lyrics is not None:
+        (vdir / "lyrics.md").write_text(lyrics, encoding="utf-8")
+    if suno is not None:
+        (vdir / "suno.md").write_text(suno, encoding="utf-8")
+    return vdir
+
+
+def test_choose_copies_both_files_into_the_root(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "b", lyrics="варіант Б", suno="Style Б")
+    commands.cmd_choose("psalm-10", "b")
+    assert (sdir / "lyrics.md").read_text(encoding="utf-8") == "варіант Б"
+    assert (sdir / "suno.md").read_text(encoding="utf-8") == "Style Б"
+
+
+def test_choose_records_the_chosen_variant_and_its_style(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "b")
+    data = meta.read_meta(sdir)
+    data["variants"] = [
+        {"id": "a", "style": "intimate-folk", "angle": "жертва"},
+        {"id": "b", "style": "casting-crowns", "angle": "свідок"},
+    ]
+    meta.write_meta(sdir, data)
+    commands.cmd_choose("psalm-10", "b")
+    after = meta.read_meta(sdir)
+    assert after["chosen_variant"] == "b"
+    assert after["style"] == "casting-crowns"
+
+
+def test_choose_leaves_the_stage_alone(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "a")
+    before = meta.read_meta(sdir)
+    commands.cmd_choose("psalm-10", "a")
+    after = meta.read_meta(sdir)
+    assert after["stage"] == "prompted"
+    assert after["stage_history"] == before["stage_history"]
+
+
+def test_choose_rejects_an_unknown_variant(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "a")
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_choose("psalm-10", "d")
+    assert "unknown variant: d" in str(err.value)
+
+
+def test_choose_rejects_an_incomplete_variant(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "b", suno=None)
+    with pytest.raises(commands.CommandError) as err:
+        commands.cmd_choose("psalm-10", "b")
+    assert "missing: variants/b/suno.md" in str(err.value)
+
+
+def test_choose_can_be_run_again_with_another_variant(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "a", lyrics="перший", suno="Style A")
+    _make_variant(sdir, "c", lyrics="третій", suno="Style C")
+    commands.cmd_choose("psalm-10", "a")
+    commands.cmd_choose("psalm-10", "c")
+    assert (sdir / "lyrics.md").read_text(encoding="utf-8") == "третій"
+    assert meta.read_meta(sdir)["chosen_variant"] == "c"
+
+
+def test_choose_keeps_the_style_when_the_variant_is_not_listed_in_meta(lib):
+    sdir = _make_song(lib, "psalm-10", stage="prompted", with_inputs=False)
+    _make_variant(sdir, "a")
+    data = meta.read_meta(sdir)
+    data["style"] = "hillsong"
+    meta.write_meta(sdir, data)
+    commands.cmd_choose("psalm-10", "a")
+    assert meta.read_meta(sdir)["style"] == "hillsong"
