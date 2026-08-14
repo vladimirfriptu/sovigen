@@ -1,0 +1,59 @@
+{
+  "meta_version": 2,
+  "title": "Твердиня в час скорботи",
+  "slug": "твердиня-в-час-скорботи",
+  "stage": "pre-published",
+  "created": "2026-08-14",
+  "source": "psalm-9",
+  "series": "psalms",
+  "language": "uk",
+  "style": "casting-crowns",
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-08-14"
+    }
+  ],
+  "video_style": "freqline"
+}
