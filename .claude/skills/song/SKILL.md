@@ -1,6 +1,6 @@
 ---
 name: song
-description: Drive ONE song through the creative half of the sovigen pipeline — from `idea` through brief, lyrics and the Suno prompt to a downloaded take at `recorded` — resuming from wherever it currently is. Use when the user says "погнали песню по Псалму 9", "продолжим <name>", "что там с <name>", "новая песня", or names a song without saying what to do with it. Resumable: always read the state first, never assume.
+description: Drive ONE song through the creative half of the sovigen pipeline — from `idea` through the briefs, three variant texts and three Suno prompts to a downloaded take at `recorded` — resuming from wherever it currently is. Use when the user says "погнали песню по Псалму 9", "продолжим <name>", "что там с <name>", "новая песня", or names a song without saying what to do with it. Resumable: always read the state first, never assume.
 ---
 
 # Drive a song through the creative pipeline
@@ -14,9 +14,14 @@ Stages and who moves next:
 idea → brief → lyrics → prompted → recorded → ready → pre-published → published
 ```
 
-`idea`/`brief`/`lyrics` are Claude's turn. `prompted` waits for the human in
-Suno. From `recorded` on, the cover and the video are outside this skill —
-`release-song` builds the video once a cover and `youtube.md` exist.
+`idea`/`brief`/`lyrics` are Claude's turn and run without a single question.
+`prompted` waits for the human in Suno: he generates all three variants, listens,
+and picks one. From `recorded` on, the cover and the video are outside this skill
+— `release-song` builds the video once a cover and `youtube.md` exist.
+
+**Three variants, not one.** The creative half produces three self-contained
+readings of the psalm (`variants/a|b|c/`), each with its own style, angle and
+formal device. The owner's single decision is made on audio, at `prompted`.
 
 ## Steps
 
@@ -37,9 +42,10 @@ is visible. Then work through them.
 2. **Resolve the song — two cases.**
 
    **It exists** (a row in `status`): read `library/<slug>/meta.json` for
-   `stage`, `style`, `source`, `series`, `stage_history`. Tell the user in one
-   line where it stands and what the next step is, then continue from that
-   stage in step 4. Never restart a stage that is already behind.
+   `stage`, `style`, `variants`, `chosen_variant`, `source`, `series`,
+   `stage_history`. Tell the user in one line where it stands and what the next
+   step is, then continue from that stage in step 4. Never restart a stage that
+   is already behind.
 
    **It does not exist** (the user names a theme — «песня по Псалму 23» — or a
    title with no folder): the slug is permanent and the folder cannot be
@@ -52,7 +58,8 @@ is visible. Then work through them.
    ```
 
    `--language` defaults to `uk`. The command creates `library/<slug>/` at
-   `stage: idea` with every artifact template already in place.
+   `stage: idea` with every root artifact template already in place. The
+   `variants/` directories are created later, by `song-brief`.
 
 3. **Glance at the series queue, once per session.** Read
    `knowledge/series/psalms.md`. If the «Очередь» table has fewer than five
@@ -64,32 +71,42 @@ is visible. Then work through them.
 
    | Stage now | What you do |
    |---|---|
-   | `idea` | `song-brief` → it STOPS at the concept and waits |
+   | `idea` | `song-brief` → root brief + three variant briefs, no stop |
    | `brief` | `song-lyrics`, then immediately `song-suno` — no pause between them |
    | `lyrics` | `song-suno` |
    | `prompted` | step 5 — the user's turn in Suno |
    | `recorded` | step 6 — hand off |
 
-   The only stop inside the creative half is after `brief.md`. `lyrics.md` and
-   `suno.md` are written back-to-back and presented together at the end of
-   `song-suno`. Do not insert a checkpoint between them.
+   There is no stop in the creative half at all. `song-suno` presents three
+   texts with their `Style` / `Exclude Styles` pairs in one message and stops
+   there.
 
 5. **At `prompted`, wait for the human.** There is no Suno API. Say, in
-   Russian: «Генери в Suno и послушай. Как выберешь дубль — скажи какой и
-   откуда его скачал, дальше я сам.»
+   Russian: «Сгенери все три в Suno и послушай. Как выберешь — скажи какой
+   вариант и откуда скачал файл, дальше я сам.»
 
-   When the user comes back naming a take:
-   - Find the file yourself. It is normally the freshest `.mp3` in
-     `~/Downloads`: `ls -t ~/Downloads/*.mp3 | head -5`. If several plausibly
-     match, show the candidates with their timestamps and ask which — never
-     guess between takes.
-   - `just import <slug> <path>` — copies it in as `track.mp3` and moves any
-     previous audio into `raw/` on its own. Never move or rename files by hand.
-   - `just advance <slug>` → `prompted -> recorded`. It refuses if no audio is
-     present, which is the check that the import landed.
-   - Moving files is Claude's job. Only three actions belong to the user:
-     generating and listening in Suno, choosing a take, and uploading to
-     YouTube.
+   When the user comes back naming a variant and a take, do these in order:
+
+   1. `just choose <slug> <id>` — copies that variant's `lyrics.md` and
+      `suno.md` into the song root and records `chosen_variant` and `style`.
+      Run it first: everything downstream reads the root files.
+   2. Find the audio file yourself. It is normally the freshest `.mp3` in
+      `~/Downloads`: `ls -t ~/Downloads/*.mp3 | head -5`. With three variants
+      generated there will be several fresh files — if more than one plausibly
+      matches, show the candidates with their timestamps and ask which. Never
+      guess between takes.
+   3. `just import <slug> <path>` — copies it in as `track.mp3` and moves any
+      previous audio into `raw/` on its own. Never move or rename files by hand.
+   4. `just advance <slug>` → `prompted -> recorded`. It refuses if no audio is
+      present, which is the check that the import landed.
+   5. Write a `## Вердикт` section into each losing `variants/<id>/brief.md` —
+      one line on why it lost, in the owner's own words where he gave them
+      («барабаны забивают текст», «слишком светло»). This is the only record of
+      what did not work; a future `song-retro` skill reads it.
+
+   Moving files is Claude's job. Only three actions belong to the user:
+   generating and listening in Suno, choosing a variant and a take, and
+   uploading to YouTube.
 
 6. **At `recorded`, stop and hand off.** Report what exists. The next stage,
    `ready`, needs a cover image and a filled `youtube.md` — neither is
@@ -101,22 +118,20 @@ is visible. Then work through them.
 ## Advancing
 
 `just advance <slug>` moves exactly one stage and only checks that the files
-that stage requires exist — and the templates create most of them at `new`. So
-the file check is not the gate. Two transitions need the user's word, and only
-those two:
+that stage requires exist. `lyrics.md` and `suno.md` count as present when they
+sit in the root **or** in any `variants/<id>/`, so the creative stages advance on
+variant files alone. The file check is not the gate.
 
 | Transition | What authorizes it |
 |---|---|
-| `idea → brief` | the content gate — an explicit yes to the concept and the style |
-| `prompted → recorded` | the user has generated in Suno and named the take |
-| `brief → lyrics`, `lyrics → prompted` | nothing extra — bookkeeping inside the block the brief gate already authorized |
+| `prompted → recorded` | the user has generated in Suno, chosen a variant and named the take |
+| `idea → brief`, `brief → lyrics`, `lyrics → prompted` | nothing extra — bookkeeping inside the creative half |
 
-Never advance past a content gate or a human action without the user's word.
-Do **not** ask for one before `brief → lyrics` or `lyrics → prompted`: those
-two files are written back-to-back and shown together, and a question there is
-the forbidden extra checkpoint. If the user asks for edits after seeing the
-pair, edit the files in place — the stage does not move back, it only asserts
-the files exist.
+Never advance past `prompted` without the user's word. Do **not** ask for one
+before that: three variants exist precisely so the single decision can be made
+on audio, and a question earlier is the checkpoint this pipeline deliberately
+removed. If the user asks for edits after seeing the three, edit the files in
+place — the stage does not move back, it only asserts the files exist.
 
 Every transition is appended to `stage_history` in `meta.json`, which is how a
 later session can tell what really happened.
@@ -125,6 +140,10 @@ later session can tell what really happened.
 
 - Read state before acting, every time — this skill is meant to resume.
 - One song per run. If the user names several, do them one at a time.
+- Never delete a losing variant. They are the project's memory of which styles
+  missed and why.
+- Never write the root `lyrics.md` or `suno.md` by hand — `just choose` owns
+  them.
 - The user never opens or edits a file. They react in words, you edit and
   report what changed.
 - Never run `just publish` — that is the user's call after the upload.

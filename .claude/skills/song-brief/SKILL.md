@@ -1,14 +1,16 @@
 ---
 name: song-brief
-description: Write `brief.md` for one song — the concept, the emotional arc, the verse gifts, and the chosen style — then STOP and wait for the user to accept it. Use when a song is at stage `idea`, or when the user says "сделай бриф для <name>", "о чём будет песня по псалму N", "предложи стиль для <name>". This is the ONE content gate of the pipeline: never write lyrics from here.
+description: Write the briefs for one song — the shared source analysis plus THREE competing variants, each with its own concept, arc and style. Use when a song is at stage `idea`, or when the user says "сделай бриф для <name>", "о чём будет песня по псалму N", "предложи стиль для <name>". Never write lyrics from here.
 ---
 
-# Write the brief for a song
+# Write the briefs for a song
 
-Take ONE song from `stage: idea` to `stage: brief`. The output is a filled
-`brief.md` and a style recorded in `meta.json`. This is the single place in the
-pipeline where the work stops and waits for the user — the concept and the
-style are where the most expensive mistake lives.
+Take ONE song from `stage: idea` to `stage: brief`. The output is a filled root
+`brief.md` (what all three variants share) plus three `variants/<id>/brief.md`,
+and the three variants recorded in `meta.json`.
+
+This skill does **not** stop and ask. Three variants exist precisely so the
+owner's single decision can be made on audio, after Suno — see `song`.
 
 ## Inputs
 
@@ -22,8 +24,9 @@ Read, and only these:
   deviations, the "gifts of the text".
 - `knowledge/series/<series>.md` for the song's `series` from `meta.json`
   (usually `psalms`) — what is already done and in what style.
-- Only the `knowledge/styles/*.md` cards you actually shortlist — normally
-  three. Do not load all eight; `role.md` has a one-line index to pick from.
+- The `knowledge/styles/*.md` cards you shortlist. You need three that differ,
+  one per variant; `role.md` has a one-line index to pick from. Do not load all
+  eight.
 
 Do not read `knowledge/craft/suno.md` or `knowledge/log.md` here.
 
@@ -32,7 +35,7 @@ Do not read `knowledge/craft/suno.md` or `knowledge/log.md` here.
 Create a todo per step and work through them in order.
 
 1. **Read the state.** `library/<slug>/meta.json` → `title`, `source`,
-   `series`, `language`, `stage`. If `stage` is not `idea`, the brief was
+   `series`, `language`, `stage`. If `stage` is not `idea`, the briefs were
    already written: report the current stage and stop instead of overwriting.
 
 2. **Verify the source text against public-domain sources — do not write it
@@ -41,36 +44,37 @@ Create a todo per step and work through them in order.
    so it is shifted +1 against most Christian editions). Note in the brief
    which source you checked against.
 
-3. **Fill `library/<slug>/brief.md`.** Keep the template's sections and order —
-   the artifact templates hold the form across songs, do not invent a new one.
+3. **Fill the root `library/<slug>/brief.md`** — only what the three variants
+   share. Keep the template's sections; the two that belong to a single reading
+   (`## О чём песня`, `## Эмоциональная арка`) move down into the variants.
    - `## Источник` — what text this is and where it was verified.
-   - `## О чём песня` — two or three sentences about what happens to a person
-     here.
-   - `## Эмоциональная арка` — from what, to what.
    - `## Встроенные подарки текста` — repeated verses, refrains, ready-made
-     choruses. These decide the song's form before the style does.
-   - `## Стиль` — the chosen style as a `[[styles/<name>]]` link, one or two
-     sentences of why, plus two alternatives with a different accent each.
-     Link the cards, do not restate them. Remember the owner's leaning:
-     intimate and chamber over grand orchestral pathos.
+     choruses. Shared: they are properties of the psalm, not of a reading.
+   - `## Варианты` — the comparison table:
 
-4. **Show the concept to the user in the chat — as bullet points, not the
-   file.** Five or six lines: what the song is about, the arc, the gifts of
-   the text, the proposed style and the two alternatives with the reason for
-   each. The user reads the message, not `brief.md`.
+     | Вариант | Стиль | Угол | Приём | Чем не похож на другие |
+     |---|---|---|---|---|
+     | a | [[styles/…]] | … | … | … |
+     | b | … | … | … | … |
+     | c | … | … | … | … |
 
-5. **STOP.** Ask plainly, in Russian: «Годится концепция и стиль? Или менять?»
-   Then wait. Do not write lyrics, do not touch `meta.json`, do not advance.
-   - If the user reacts in words («арка слабая», «давай интимный фолк»,
-     «второй абзац не про то») — you edit `brief.md`, then say what changed
-     and ask again. Never ask the user to open or edit the file themselves.
-   - Only an explicit yes («ок», «годится», «погнали») opens the next step.
+4. **Fill `library/<slug>/variants/<id>/brief.md` for `a`, `b` and `c`.**
+   Create the directories yourself — the templates do not scaffold them, and
+   `render` never touches anything inside `variants/`. Each file carries:
+   - `## О чём песня` — two or three sentences about what happens to a person
+     in *this* reading.
+   - `## Эмоциональная арка` — from what, to what.
+   - `## Стиль` — one `[[styles/<name>]]` link and one or two sentences of why.
+     Link the card, do not restate it. No alternatives here: the other two
+     variants *are* the alternatives.
 
-6. **Record the chosen style in `meta.json`.** There is no CLI command for the
-   `style` field, so write it through the project's own meta module — it
-   normalizes the file and keeps every other field intact. Run from the repo
-   root, and substitute the slug and the style card's file stem (e.g.
-   `casting-crowns`, not `[[styles/casting-crowns]]`):
+5. **Check the three against the divergence rules below.** If two of them fail
+   the check, rewrite before going any further — a bad set of three costs three
+   texts, not one.
+
+6. **Record the three variants in `meta.json`.** There is no CLI command for
+   this field, so write it through the project's own meta module — it normalizes
+   the file and keeps every other field intact. Run from the repo root:
 
    ```bash
    python3 - <<'PY'
@@ -78,11 +82,15 @@ Create a todo per step and work through them in order.
    from sovigen import meta, paths
 
    slug = "<slug>"
-   style = "<style-card-stem>"
+   variants = [
+       {"id": "a", "style": "<card-stem>", "angle": "<угол>"},
+       {"id": "b", "style": "<card-stem>", "angle": "<угол>"},
+       {"id": "c", "style": "<card-stem>", "angle": "<угол>"},
+   ]
 
    song_dir = paths.song_dir(slug)
    data = meta.read_meta(song_dir)
-   data["style"] = style
+   data["variants"] = variants
    target = meta.meta_path(song_dir)
    tmp = target.with_suffix(".json.tmp")
    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -91,33 +99,57 @@ Create a todo per step and work through them in order.
    PY
    ```
 
+   Style stems are file names (`casting-crowns`), not links
+   (`[[styles/casting-crowns]]`). The top-level `style` field stays `null` here —
+   `just choose` fills it from the winning variant.
+
    Never hand-edit `meta.json` with Edit and never rewrite it from scratch:
    that is how `stage_history` gets lost. The temp file plus `os.replace` is
    what keeps a crash mid-write from leaving a truncated `meta.json`.
 
-7. **Verify the style landed, then advance.** `advance` does not look at
-   `style`, so a silently failed write would leave the song at `brief` with
-   `style: null` — and `song-suno` would then have no card to read. Check the
-   read-back the script printed in step 6, or run:
+7. **Verify the variants landed, then advance.** `advance` does not look at
+   `variants`, so a silently failed write would leave the song at `brief` with
+   nothing recorded — and `song-suno` would have no card to read. Run:
 
    ```bash
-   python3 -c "import json,sys; d=json.load(open('library/<slug>/meta.json')); print(d['style']); sys.exit(0 if d['style'] else 1)"
+   python3 -c "import json,sys; d=json.load(open('library/<slug>/meta.json')); print([v['id'] for v in d['variants']]); sys.exit(0 if len(d['variants']) == 3 else 1)"
    ```
 
-   If it prints `None` or exits non-zero, do **not** advance — redo step 6 and
-   find out why it failed.
+   If it prints fewer than three ids or exits non-zero, do **not** advance —
+   redo step 6 and find out why it failed.
 
-   Only then: `just advance <slug>` → `idea -> brief`.
-   `advance` only checks that `brief.md` exists (the template put it there on
-   `new`), so the check that matters is the user's yes in step 5 — never run it
-   before that.
+   Only then: `just advance <slug>` → `idea -> brief`. The gate is the root
+   `brief.md`; a variant's own `brief.md` deliberately does not satisfy it.
+
+8. **Tell the user, in two or three lines, what the three variants are** — one
+   line each: style, angle, device. Then hand straight over to `song-lyrics`.
+   Do not ask whether the set is good; the answer to that question is audio,
+   and it does not exist yet.
+
+## Как варианты остаются разными
+
+Three costumes on one song are not worth comparing. Every set of three must
+satisfy all of these, and the check happens before a single line of lyrics is
+written:
+
+- **Different style cards.** Repeating a card inside one song is forbidden.
+- **Different angle** — whose eyes the psalm is seen through (the victim, a
+  witness, an accuser, the one who waits, …).
+- **Different formal device** — e.g. a question-chorus that flips at the end; a
+  single verse used as a running refrain; no chorus at all, narrative verses.
+- **One variant on the owner's home territory** (intimate, chamber) and **one
+  deliberately far from it**. Without this rule all three drift to the safe
+  middle.
+- If two rows of the comparison table read the same in the «Чем не похож»
+  column, rewrite that variant now.
 
 ## Guardrails
 
 - Never copy a copyrighted Bible translation (Огиенко, Хоменко, Турконяк).
   The Ukrainian text is an original переспів, close in meaning.
 - Never write the psalm text from memory — verify it first.
-- One gate, here. Do not add a second one later in the pipeline.
+- There is no gate in the creative half any more. The owner's single decision is
+  made on audio, after Suno — see `song`.
 - Do not write a single line of lyrics in this skill.
 - The user never edits files. You write, they react in words.
 - Don't commit anything (project policy: wait for an explicit signal).
