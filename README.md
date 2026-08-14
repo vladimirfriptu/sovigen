@@ -65,8 +65,8 @@ idea → brief → lyrics → prompted → recorded → ready → pre-published 
 |--------|--------------|---------|
 | `idea` | папка создана, тема ещё не сформулирована | Claude |
 | `brief` | `brief.md` написан — о чём песня | Claude |
-| `lyrics` | `lyrics.md` готов — финальный текст | Claude |
-| `prompted` | `suno.md` готов — промпт для Suno | вы (сгенерировать в Suno) |
+| `lyrics` | тексты готовы — по одному в каждом варианте | Claude |
+| `prompted` | промпты для Suno готовы — по одному в каждом варианте | вы (сгенерировать все варианты и выбрать) |
 | `recorded` | трек скачан и лежит в папке как `track.mp3` | Claude |
 | `ready` | обложка и `youtube.md` готовы, можно собирать видео | Claude |
 | `pre-published` | `youtube.mp4` собран | вы (залить на YouTube) |
@@ -78,14 +78,23 @@ idea → brief → lyrics → prompted → recorded → ready → pre-published 
 человеком (сгенерировать в Suno, залить на YouTube); во всех остальных
 следующий шаг делает Claude.
 
+Текст и промпт пишутся сразу в трёх вариантах (`variants/a|b|c/`): каждый со
+своим стилем, углом и приёмом. Выбор делается на слух после генерации в Suno —
+`just choose <slug> <id>` переносит победителя в корень песни, и дальше
+пайплайн работает с обычной одной песней. Проигравшие варианты остаются в
+папке: это единственная память о том, какой стиль не подошёл и почему.
+
 Внутри папки песни:
 
 ```
 library/<slug>/
-  meta.json                 # стейт: title, slug, stage, source, series, language, created, stage_history
-  brief.md                  # бриф: о чём песня
-  lyrics.md                 # финальный текст песни
-  suno.md                   # промпт для генерации в Suno
+  meta.json                 # стейт: title, slug, stage, source, series, language, created, stage_history, variants, chosen_variant
+  brief.md                  # общий разбор источника + таблица сравнения вариантов
+  variants/a/               # вариант: brief.md, lyrics.md, suno.md
+  variants/b/               # ещё один — другой стиль, угол и приём
+  variants/c/               # и третий
+  lyrics.md                 # копия выбранного варианта (кладёт choose)
+  suno.md                   # копия выбранного варианта (кладёт choose)
   cover-prompt.md           # промпт для генерации обложки
   youtube.md                # заголовок/описание для YouTube
   notes.md                  # свободные заметки
@@ -108,6 +117,10 @@ just new "My Track Name"           # создаёт library/my-track-name (stage
 
 just advance my-track-name         # двигает песню на следующую стадию,
                                    # если для неё готовы нужные файлы
+
+just choose my-track-name b        # переносит вариант b в корень песни
+                                   # (lyrics.md, suno.md), пишет chosen_variant
+                                   # и style; стадию не двигает
 
 just import my-track ~/Downloads/take.mp3
                                    # кладёт скачанный файл в папку песни под

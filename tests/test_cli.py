@@ -168,3 +168,24 @@ def test_status_json_reports_broken_song_without_dying(lib, capsys):
     payload = {row["slug"]: row for row in json.loads(capsys.readouterr().out)}
     assert payload["good-one"]["stage"] == "idea"
     assert payload["bad-one"]["stage"] == "unreadable"
+
+
+def test_choose_promotes_the_variant(lib, capsys):
+    sdir = lib / "psalm-10"
+    (sdir / "raw").mkdir(parents=True)
+    meta.write_meta(sdir, meta.new_meta("Псалом 10", "psalm-10", "2026-08-14"))
+    vdir = sdir / "variants" / "b"
+    vdir.mkdir(parents=True)
+    (vdir / "lyrics.md").write_text("варіант Б", encoding="utf-8")
+    (vdir / "suno.md").write_text("Style Б", encoding="utf-8")
+    assert main(["choose", "psalm-10", "b"]) == 0
+    assert (sdir / "lyrics.md").read_text(encoding="utf-8") == "варіант Б"
+    assert "chose b for psalm-10" in capsys.readouterr().out
+
+
+def test_choose_reports_an_unknown_variant(lib, capsys):
+    sdir = lib / "psalm-10"
+    (sdir / "raw").mkdir(parents=True)
+    meta.write_meta(sdir, meta.new_meta("Псалом 10", "psalm-10", "2026-08-14"))
+    assert main(["choose", "psalm-10", "d"]) == 1
+    assert "unknown variant: d" in capsys.readouterr().err

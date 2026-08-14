@@ -24,6 +24,10 @@ def main(argv=None) -> int:
     p_advance = sub.add_parser("advance")
     p_advance.add_argument("slug")
 
+    p_choose = sub.add_parser("choose")
+    p_choose.add_argument("slug")
+    p_choose.add_argument("variant")
+
     p_import = sub.add_parser("import")
     p_import.add_argument("slug")
     p_import.add_argument("path")
@@ -68,6 +72,10 @@ def _dispatch(args) -> int:
             print(f"{args.slug} already at {moved_to}")
         else:
             print(f"{args.slug}: {moved_from} -> {moved_to}")
+        return 0
+    if args.command == "choose":
+        commands.cmd_choose(args.slug, args.variant)
+        print(f"chose {args.variant} for {args.slug}")
         return 0
     if args.command == "import":
         dest = commands.cmd_import(args.slug, args.path)

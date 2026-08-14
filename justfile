@@ -17,6 +17,10 @@ new title *args:
 advance slug:
     {{python}} -m sovigen.cli advance "{{slug}}"
 
+# promote one variant into the song root: just choose my-track b
+choose slug variant:
+    {{python}} -m sovigen.cli choose "{{slug}}" "{{variant}}"
+
 # place a downloaded file into the song folder: just import my-track ~/Downloads/take.mp3
 import slug path:
     {{python}} -m sovigen.cli import "{{slug}}" "{{path}}"
