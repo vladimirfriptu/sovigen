@@ -116,8 +116,10 @@ is visible. Then work through them.
 6. **At `recorded`, stop and hand off.** Report what exists. The next stage,
    `ready`, needs a cover image and a filled `youtube.md` — neither is
    automated in this phase. Say what is missing and offer to write `youtube.md`
-   from `knowledge/craft/youtube.md` and the cover prompt from
-   `knowledge/craft/cover.md`. Once a cover is in the folder, `release-song`
+   from `knowledge/craft/youtube.md` and the cover prompts from
+   `knowledge/craft/cover.md` — **three of them, deliberately different in
+   medium and scale**, the same way the song itself gets several variants. Once
+   a cover is in the folder, `release-song`
    builds `youtube.mp4`.
 
 ## Advancing
