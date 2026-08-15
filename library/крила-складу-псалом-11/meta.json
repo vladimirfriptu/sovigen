@@ -2,12 +2,12 @@
   "meta_version": 3,
   "title": "Крила складу (Псалом 11)",
   "slug": "крила-складу-псалом-11",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-08-15",
   "source": "psalm-11",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "hillsong",
   "variants": [
     {
       "id": "a",
@@ -35,7 +35,7 @@
       "angle": "один із «синів людських» під поглядом (ст. 4 ↔ 7)"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "d",
   "suno_takes": 0,
   "stage_history": [
     {
@@ -68,6 +68,10 @@
     },
     {
       "stage": "prompted",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "recorded",
       "at": "2026-08-15"
     }
   ]
