@@ -2,44 +2,52 @@
 song: крила-складу-псалом-11
 artifact: suno
 variant: b
-style: lauren-daigle
+style: casting-crowns
 ---
 
-# Крила складу (Псалом 11) — генерация в Suno, вариант b
+# Крила складу (Псалом 11), вариант `b` — генерация в Suno
+
+База — строки карточки [[styles/casting-crowns]], дополненные размером и
+темпом под эту песню и полным антивокализационным набором из [[craft/suno]].
 
 ## Style
 
 ```
-soulful pop ballad, 72 BPM, slow 4/4 with a laid-back backbeat, husky female
-lead in a low register, warm electric piano and Rhodes, brushed drums, upright
-bass, subtle organ pad under the last chorus only, intimate close-mic
-performance, restrained dynamics that never reach a belt, clean straight-tone
-vocal, syllabic delivery (one note per syllable), restrained on-the-beat
-phrasing, no runs, no ad-libs, Ukrainian lyrics
+contemporary Christian pop-rock ballad, male baritone lead, narrative delivery,
+4/4 at 70 BPM, acoustic guitar intro building to full band by the third verse
+and pulling back to acoustic at the end, warm analog drums with brushes early,
+upright bass, one room live take feel, clean straight-tone vocal, syllabic
+delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no
+ad-libs, single lead voice throughout with no backing singers, every sung sound
+is a written word, no vocalizations, no vocal fills between lines, silence where
+there are no lyrics, the instrumental break has no voice at all, the song ends
+on the written last line and stops
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums,
-belting, gospel choir, stadium reverb, key change, power ballad climax
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, crowd vocals, crowd noise, live audience, audience
+shouts, hey shouts, wordless backing vocals, background vocalizations, chanting,
+la-la-la vocals, vocal pads, EDM, trap drums, arena anthem, stadium reverb,
+gospel choir, distorted guitars, double-time
 ```
 
 ## Советы по генерации
 
-- Медленное 4/4 на ~72 BPM. Соул-подача тут нужна ради того, чтобы фраза
-  договаривалась тихо: как только вокал начинает дожимать, вариант перестаёт
-  быть уговором и становится проповедью.
-- Ожидаемая длина 3:10–3:30. Если режет — убирай **второй `[Chorus]`** (перед
-  бриджем): припев звучит трижды, и первого раза достаточно, чтобы вопрос
-  запомнился. Финальный припев не трогать: в нём весь приём — те же слова,
-  другой смысл.
-- Главный риск карточки — мелизмы на длинных гласных «скажи мені» и «зробить».
-  Антимелизменный набор здесь обязателен целиком; если вокал распевается уже в
-  первом припеве, дубль можно закрывать.
-- Второй признак провального дубля: финальный припев спет громче предыдущих или
-  с модуляцией. Он должен быть плотнее, но не выше — иначе поворот читается как
-  триумф, а не как то, что человек тихо передумал.
-- Бридж («А ти мені тихо…») — самая длинная секция без ритма. Если Suno
-  проглатывает её и уходит сразу в припев, генерируй в два захода и склеивай.
+- 4/4 на 70 BPM — самый медленный из трёх и единственный разговорный. Голос
+  должен звучать так, будто человек отвечает собеседнику, а не залу.
+- Ждать примерно 3:20 — четыре куплета длиннее обычного. Если режет: сократить
+  `[Verse 4]` до четырёх строк (убрать «У Нього для них є вогонь і вітер, / і
+  Він не забуде долити») — рефрен и ст. 7 при этом остаются.
+- **Признак провального дубля:** повторяющаяся строка «Я сховався в Господі — і
+  я не полечу» спета каждый раз одинаково громко. Она обязана расти от куплета
+  к куплету, это единственное движение песни; ровный рефрен — мимо.
+- Второй признак: появились подпевающие голоса. В этом варианте один голос от
+  начала до конца, поэтому в Style стоит `single lead voice`, а хоровые строки
+  из карточки `youth-guitar` сюда сознательно не перенесены.
+- Прямую речь друга Suno иногда поёт с той же интонацией, что и ответ. Если
+  разница интонаций совсем не читается — второй дубль, текст в порядке.

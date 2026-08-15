@@ -87,4 +87,6 @@ Create a todo per variant and work through them in order.
 - The user never edits files. When they react in words later
   («второй вариант слабый, там нужен образ воды»), you edit that variant's
   `lyrics.md` and report what changed.
-- Don't commit anything.
+- **Commit and push when the stage is done** — every iteration ends in the
+  remote, because the owner reads `library/` in Obsidian on his phone and the
+  repository is the only sync channel. See the project `CLAUDE.md`.

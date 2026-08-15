@@ -2,47 +2,58 @@
 song: тепер-устану-псалом-12
 artifact: suno
 variant: a
-style: intimate-folk
+style: imagine-dragons
 ---
 
 # Тепер устану (Псалом 12) — вариант a, генерация в Suno
 
+Стиль — ориентир владельца **Imagine Dragons** из [[styles/references]].
+Карточки в `knowledge/styles/` нет, поэтому строки ниже собраны под эту песню, а
+не взяты готовыми. Имя группы в промпт не вписано намеренно: Suno на имена
+исполнителей реагирует плохо, и описание работает надёжнее.
+
 ## Style
 
 ```
-intimate acoustic folk, contemporary Christian ballad, 6/8 at 64 BPM, slow
-sway, warm male lead close to the microphone speaking more than singing,
-fingerpicked acoustic guitar, hammered dulcimer and mandolin, upright bass,
-brushed drums entering only halfway through, small room sound with natural
-reverb, sparse arrangement that never goes big, no chorus and no climax,
-clean straight-tone vocal, syllabic delivery (one note per syllable),
-restrained on-the-beat phrasing, no runs, no ad-libs
+arena alt-pop rock, 4/4 at 92 BPM, huge live floor toms and thundering tribal
+drum pattern, deep analog synth pad and low sub bass under a real rhythm section,
+single distorted guitar riff, wide dynamic contrast between a hushed near-spoken
+verse and a wall-of-sound chorus, male mid-range lead voice, one lower calm male
+voice for the bridge, big room drums with natural decay, clean straight-tone
+vocal, syllabic delivery (one note per syllable), restrained on-the-beat
+phrasing, no runs, no ad-libs, every sung sound is a written word, no
+vocalizations, no vocal fills between lines, silence where there are no lyrics
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums,
-stadium reverb, orchestral bombast, big drums, anthemic chorus, key change,
-gospel choir, group vocals, electric guitar
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, crowd vocals, crowd noise, live audience, audience
+shouts, hey shouts, wordless backing vocals, background vocalizations, chanting,
+football chant, la-la-la vocals, vocal pads, gospel choir, children's choir,
+EDM drop, trap drums, autotune, rap verse, country, americana, orchestral
+strings
 ```
 
 ## Советы по генерации
 
-Размер 6/8 и 64 BPM — самый медленный в наборе; это единственный вариант,
-который качается, а не идёт вперёд. Семь куплетов подряд без припева — длинно,
-но по времени укладывается примерно в 3 минуты, если Suno не растягивает
-проигрыши.
-
-Что слушать: куплет 4 — единственная цитата Бога — должен прозвучать **тише**
-или ровно так же, как остальные, а не громче. Если Suno делает из него припев с
-подъёмом, приём сломан: смысл в том, что обещание сказано в комнате, а не со
-сцены. Так же и куплет 6 (возврат первой строки) — он обязан звучать как первый,
-без нарастания.
-
-Провал такта: если после куплета 4 входит полная бэнд-аранжировка или в куплете
-7 появляется хор — берите следующий дубль, дальше слушать нечего.
-
-Если режет по длине — убирайте куплет 3 (его содержание частично дублируется в
-варианте `b`), а не куплет 7: без последнего куплета кольцо не закрывается.
+- **Темп 92, 4/4, барабаны — главный инструмент.** Если ритм-секция выходит
+  мелкой и аккуратной, вариант провален: весь смысл жанра здесь в том, что
+  припев физически больше куплета.
+- **Перевёртыш надо услышать.** Первые два припева — «Устань, Господи, устань!»
+  голосом снизу; третий — «Тепер устану» тем же напевом, но спокойно и от
+  первого лица. Если Suno споёт третий припев так же надрывно, как первые два,
+  главный приём песни не сработал — это провальный дубль.
+- **Бридж должен быть почти проговорён,** ниже по регистру, с минимальной
+  подложкой. Это единственное место, где звучит голос Бога, и он не кричит.
+- **Проигрыш после второго припева отмечен `no vocals` прямо в теге** — именно
+  там владелец слышал «е-е» в конце проигрыша. Если голос всё же дотягивает
+  хвост, перегенерируй, а не правь Exclude: разметка — первый слой защиты,
+  запреты — третий и самый слабый.
+- **Длина.** Одиннадцать секций, ожидаемо 3:05–3:25. Если режет — убрать второй
+  `[Pre-Chorus]` целиком, а не припев: припевов ровно три и они несут перевёртыш.
+- **Аутро тихое.** Песня не заканчивается победой; если финал выведет в
+  стадионный анфем, смысл ст. 9 потерян.

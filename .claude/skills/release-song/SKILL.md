@@ -82,6 +82,8 @@ step 5 verification for each slug it reports as built.
 
 - Never run `just publish` on your own — that's the user's call.
 - Never create or rename input files. Missing/ambiguous inputs → ask.
-- Don't commit anything (project policy: wait for an explicit signal).
+- **Commit and push when the stage is done** — every iteration ends in the
+  remote, because the owner reads `library/` in Obsidian on his phone and the
+  repository is the only sync channel. See the project `CLAUDE.md`.
 - The Python CLI uses stdlib only, so `python3 -m sovigen.cli` works without
   the venv; the venv is only for `just test`.

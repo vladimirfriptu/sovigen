@@ -2,56 +2,53 @@
 song: освіти-мої-очі-псалом-13
 artifact: suno
 variant: b
-style: youth-guitar
+style: imagine-dragons
 ---
 
-# Освіти мої очі (Псалом 13) — вариант b — генерация в Suno
+# Освіти мої очі (Псалом 13) — генерация в Suno, вариант `b`
 
 ## Style
 
 ```
-acoustic guitar singalong, 4/4 at 100 BPM, steady stubborn strum rather than an
-upbeat one, bright strummed acoustic guitar with a capo, warm male mid-range lead
-singing plainly, group vocals singing the written lyrics in unison on every chorus
-and growing louder each time, words only, no wordless backing vocals, no crowd
-noise between lines, every sung sound is a written word, no vocalizations, no
-vocal fills between lines, silence where there are no lyrics, first chorus nearly
-solo and the last one full room, light cajon and hand percussion only entering at
-the second verse, simple three-chord harmony, live take feel as if recorded in one
-room with several people, no studio polish, clean straight-tone vocal, syllabic
-delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no
-ad-libs
+big alt-pop rock in Ukrainian, 4/4 at 92 BPM, huge live drums with floor toms
+and a hard backbeat, deep analog synth pulse under a real rhythm section, gritty
+male lead in a low-to-mid register, half-whispered in the first verse and full
+chest voice by the last, one short two-word hook repeated between verses,
+electronics layered over live playing and never replacing it, each verse denser
+than the one before, every sung sound is a written word, no vocalizations, no
+vocal fills between lines, silence where there are no lyrics, clean
+straight-tone vocal, syllabic delivery (one note per syllable), restrained
+on-the-beat phrasing, no runs, no ad-libs, hard stop after the instrumental
+outro
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums, electronic
-drums, autotune, processed vocals, stadium reverb, arena anthem, pop production,
-electric guitar solo, orchestral strings, gospel choir, children's choir, country,
-americana, ska, punk, double-time, crowd vocals, crowd noise, live audience,
-audience shouts, hey shouts, wordless backing vocals, background vocalizations,
-chanting, football chant, la-la-la vocals, vocal pads, vocalizations, vocalise,
-scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah, hey
-hey, oh oh, ah ah, eh eh, female lead
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, crowd vocals, crowd noise, live audience, audience
+shouts, hey shouts, wordless backing vocals, background vocalizations, chanting,
+football chant, la-la-la vocals, vocal pads, gang vocals, stadium sing-along,
+gospel choir, orchestral strings, acoustic ballad, country, trap drums, autotune,
+rap verse, fade-out ending
 ```
 
 ## Советы по генерации
 
-100 BPM — нижняя граница карточки, взята сознательно: песня о том, что человека
-не бросают, и бодрый темп её сломает. Ожидаемая длина 2:40–3:00.
-
-Провал дубля — одинаковые припевы. Их три, и они обязаны расти: первый почти
-сольный, второй с несколькими голосами, третий полной комнатой. Если первый
-припев уже хоровой — останавливайся сразу, единственное движение песни съедено.
-
-Второй маркер: третий припев поётся на «доки» вместо «доти». Слово меняется
-одно, и на нём держится весь перелом варианта; Suno склонна выровнять припевы по
-первому. Слушай именно эту строку.
-
-Третий: `whoa-oh` в припеве. Он в Exclude, но жанр тянет его сам — нужны голоса
-на словах, а не скандирование.
-
-Если режет по длине — убирай `[Chorus 2]`, но не `[Chorus 3]`: без него песня
-остаётся вопросом.
+- Ориентир — **Imagine Dragons** (большие барабаны, короткий хук, электроника
+  поверх живого ритма). Название группы в `Style` не пишем — Suno фильтрует
+  имена исполнителей.
+- 92 BPM, 4/4 — заметно быстрее и прямее варианта `a`. Если на слух получилось
+  такое же покачивание, как в `a`, дубль не годится: два варианта не должны
+  делить размер и темп.
+- Длина: четыре куплета и три хука — самый короткий из трёх вариантов, около
+  2:30. Резать нечего и не нужно; если Suno выйдет короче трёх минут, это норма.
+- В тексте нет припева. Если Suno всё же начнёт петь хук хором и с подпевкой —
+  это не то: хук должен звучать одним голосом, а в третий раз вообще без
+  барабанов.
+- **Что делает дубль неудачным:** голос в `[Instrumental outro]`. Проигрыш в
+  конце — то самое место, где Suno дотягивает «е-е»; в тексте он помечен
+  `no vocals` и закрыт `[End]`, но проверять надо именно там, с последних
+  двадцати секунд.

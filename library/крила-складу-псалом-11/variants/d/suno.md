@@ -2,56 +2,57 @@
 song: крила-складу-псалом-11
 artifact: suno
 variant: d
-style: youth-guitar
+style: hillsong
 ---
 
 # Крила складу (Псалом 11) — вариант d, генерация в Suno
 
-Строки взяты из карточки [[styles/youth-guitar]] и подстроены под этот вариант:
-темп по нижней границе и явная перекличка двух сторон.
+Строки взяты из карточки [[styles/hillsong]] и дополнены защитой от вокализаций
+по [[craft/suno]]. Ориентир — Hillsong, первый уровень [[styles/references]];
+имя группы в промпт не вписано, Suno фильтрует имена исполнителей.
 
 ## Style
 
 ```
-acoustic guitar singalong, 4/4 at 100 BPM, bright strummed acoustic guitar with a
-capo, warm male mid-range lead singing plainly, call and response between the lead
-voice and a small group answering him, group vocals singing the written lyrics in
-unison on every chorus and growing louder each time, words only, no wordless
-backing vocals, no crowd noise between lines, every sung sound is a written word,
-no vocalizations, no vocal fills between lines, silence where there are no lyrics,
-light cajon and hand percussion only, simple three-chord harmony, live take feel
-as if recorded in one room with several people, no studio polish, clean
-straight-tone vocal, syllabic delivery (one note per syllable), restrained
-on-the-beat phrasing, no runs, no ad-libs
+contemporary Christian pop-rock ballad, 4/4 at 72 BPM, anthemic chorus, male
+lead with supporting group vocals singing the written lyrics only, atmospheric
+electric guitar swells, wide reverb pads, steady build from a soft verse to a
+full-band chorus and back down at the end, clean straight-tone vocal, syllabic
+delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no
+ad-libs, every sung sound is a written word, no vocalizations, no vocal fills
+between lines, silence where there are no lyrics, instrumental sections stay
+fully instrumental with no voice at all, the song ends on the written last line
+and stops
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums, electronic
-drums, autotune, processed vocals, stadium reverb, arena anthem, pop production,
-electric guitar solo, orchestral strings, gospel choir, children's choir, country,
-americana, ska, punk, double-time, crowd vocals, crowd noise, live audience,
-audience shouts, hey shouts, wordless backing vocals, background vocalizations,
-chanting, football chant, la-la-la vocals, vocal pads, vocalizations, vocalise,
-scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah, hey
-hey, oh oh, ah ah, eh eh
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, crowd vocals, crowd noise, live audience,
+audience shouts, wordless backing vocals, background vocalizations, chanting,
+vocal pads, key change, gospel choir, EDM, trap drums, autotune, orchestral
+strings, country, americana
 ```
 
 ## Советы по генерации
 
-- **Перекличка — это половина варианта.** Куплеты поёт один голос (чужой совет),
-  припев отвечает компания. Если Suno сведёт всё к одному вокалу с подпевкой,
-  спор двух голосов исчезнет и останется обычная песня — это провальный дубль.
-- **Подпевка обязана расти:** первый припев почти сольный, последний хоровой и
-  самый громкий.
-- **100 BPM, а не 104** — на четыре медленнее, чем «Ти бачиш» (Псалом 10, та же
-  карточка). Это сознательный развод пары; если дубль вышел быстрее и бодрее,
-  песни начнут звучать близнецами.
-- **Живая комната.** Гладкий продакшн с обработанным вокалом убивает жанр —
-  `autotune`, `processed vocals`, `pop production` держи в Exclude целиком.
-- **Аутро:** предпоследняя строка хором, последняя («Ми стоїмо, де стояли») —
-  одним голосом. Если её споют все, песня закончится лозунгом.
-- **Длина.** Восемь секций, ожидаемо 3:00–3:20. Если режет — убрать второй
-  `[Chorus]`, но тогда подпевка вырастет в два шага вместо трёх.
+- **Провальный дубль — тот, где последний припев громче предыдущего.** По брифу
+  финал должен звучать свободнее, а не мощнее: у псалма нет счастливой развязки,
+  ст. 6 — огонь и сера. Если Suno выводит третий припев на стадионный пик,
+  перегенерируй. `key change` стоит в Exclude ровно за этим — модуляция к финалу
+  превращает суд в праздник.
+- **`spontaneous worship` держи в Exclude целиком**, несмотря на жанр: карточка
+  предупреждает, что этот стиль сам тянет за собой распевки.
+- **Слушай хвост проигрыша.** `[Instrumental break]` помечен как безголосый, а
+  текст заканчивается `[End]` — на прошлых дублях именно там появлялось «е-е».
+- **Подпевка поёт слова.** `supporting group vocals singing the written lyrics
+  only` в Style плюс антивыкриковый блок в Exclude: никаких «о-о-о» на фоне
+  припева.
+- **72 BPM** — медленнее всех остальных вариантов этой песни, кроме `b` (70).
+  Разводить их надо не темпом, а фактурой: у `b` акустика и нарратив без
+  припева, здесь пэды и большой хук.
+- **Длина.** Десять секций, ожидаемо 3:20–3:40. Если режет — убрать второй
+  `[Pre-Chorus]`, а не припев.

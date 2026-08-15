@@ -155,4 +155,6 @@ later session can tell what really happened.
 - Never `just build` from here; that is `release-song`.
 - The Python CLI is stdlib-only, so `python3 -m sovigen.cli` works without the
   venv. The venv is only for `just test`.
-- Don't commit anything (project policy: wait for an explicit signal).
+- **Commit and push when the stage is done** — every iteration ends in the
+  remote, because the owner reads `library/` in Obsidian on his phone and the
+  repository is the only sync channel. See the project `CLAUDE.md`.

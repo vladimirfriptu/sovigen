@@ -11,23 +11,49 @@
   "variants": [
     {
       "id": "a",
-      "style": "intimate-folk",
-      "angle": "последний оставшийся верным, считает потери"
+      "style": "imagine-dragons",
+      "angle": "ограбленный бідний зі ст. 6, чей стон поднял Бога"
     },
     {
       "id": "b",
-      "style": "youth-guitar",
-      "angle": "«мы» — компания, перепевающая хвастовство словами Бога"
+      "style": "bad-omens",
+      "angle": "тот, кто стоит внутри кольца нечестивих зі ст. 9"
     },
     {
       "id": "c",
-      "style": "king-and-country",
-      "angle": "свидетель у горнила, где переплавляют речь"
+      "style": "ruah",
+      "angle": "тот, кто ждёт и взвешивает слова"
+    },
+    {
+      "id": "d",
+      "style": "hillsong",
+      "angle": "ті, хто кличе: «Спаси!» (ст. 2)"
+    },
+    {
+      "id": "e",
+      "style": "cinematic-orchestral",
+      "angle": "два хори: ст. 5 проти ст. 6, людини в кадрі немає"
     }
   ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    },
     {
       "stage": "idea",
       "at": "2026-08-15"

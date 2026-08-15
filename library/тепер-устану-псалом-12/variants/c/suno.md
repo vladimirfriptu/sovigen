@@ -2,49 +2,60 @@
 song: тепер-устану-псалом-12
 artifact: suno
 variant: c
-style: king-and-country
+style: ruah
 ---
 
 # Тепер устану (Псалом 12) — вариант c, генерация в Suno
 
+Стиль — ориентир владельца **Ruah** из [[styles/references]]. Карточки в
+`knowledge/styles/` нет, строки собраны под эту песню. Название коллектива в
+промпт не вписано; слово `worship` не вписано тоже — оно тянет за собой
+распевки (см. [[craft/suno]]), поэтому жанр назван как
+`contemporary Christian ballad`.
+
 ## Style
 
 ```
-cinematic pop-rock, 4/4 at 84 BPM, marching hammer-blow feel, driving tribal
-percussion, big taiko-style drums carrying the verses almost alone, layered
-male lead with a second harmony voice, orchestral strings held back until the
-bridge and entering only once, dramatic dynamic drop before the bridge,
-industrial forge atmosphere, clean straight-tone vocal, syllabic delivery
-(one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs
+intimate contemporary Christian ballad in Ukrainian, 6/8 at 68 BPM, fingerpicked
+steel-string acoustic guitar, soft upright-style bass entering late, brushed
+snare and light room percussion only, warm male lead voice close to the
+microphone, a second male voice joining in plain unison on the last two
+refrains, small chamber arrangement, no build to a big ending, dry warm mix as
+if recorded in one room, clean straight-tone vocal, syllabic delivery (one note
+per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, second
+voice singing the written lyrics in unison, words only, no wordless backing
+vocals, no crowd noise between lines, every sung sound is a written word, no
+vocalizations, no vocal fills between lines, silence where there are no lyrics
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums,
-gospel choir, sweet strings throughout, continuous orchestral bombast,
-acoustic folk, singalong, key change, half-time breakdown
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, crowd vocals, crowd noise, live audience, audience
+shouts, hey shouts, wordless backing vocals, background vocalizations, chanting,
+football chant, la-la-la vocals, vocal pads, arena anthem, stadium reverb,
+gospel choir, children's choir, orchestral strings, electric guitar solo, EDM,
+electronic drums, autotune, processed vocals, key change, big drum build
 ```
 
 ## Советы по генерации
 
-84 BPM, ровный маршевый 4/4 — счёт проходов должен читаться как удары молота.
-Это самый быстрый из двух «слушательских» вариантов и самый тяжёлый в наборе.
-
-Главное, что слушать: **струнные обязаны молчать до бриджа**. Весь приём в том,
-что шесть проходов идут на голосе и барабанах, и оркестр тратится один раз — на
-седьмом. Если струнные заходят с первого куплета, вариант превращается в
-обычный эпик, и владелец такое не берёт — провал такта, следующий дубль.
-
-Второе: слова счёта («Перший прохід», «Другий прохід», …) должны быть слышны
-отчётливо и стоять на сильной доле. Если Suno проглатывает числительные или
-размазывает их по такту, форма перестаёт читаться и песня становится просто
-громкой.
-
-Третье: бридж «Сьомий прохід. / Не домішка, не шлак, не порожня руда. / Голос.» —
-три коротких куска с паузами. Suno склонен заполнить паузы вокализом; если
-слышно «а-а-а» в этом месте, дубль негодный.
-
-Длина около 3 минут. Если режет — убирайте второй `[Chorus]` и оставляйте
-`[Verse 3]` сразу перед аутро.
+- **6/8 и 68 BPM — это качание, а не марш.** Единственный вариант тройки в
+  трёхдольном размере; если Suno выдаст 4/4, вариант перестаёт отличаться от
+  остальных по ощущению.
+- **Никакого билда.** `arena anthem`, `key change`, `big drum build` в Exclude
+  ради этого: рефрен повторяется четыре раза и каждый следующий должен быть
+  **тише** предыдущего. Провальный дубль — тот, где к финалу вырастает бэнд.
+- **Второй голос — только в унисон и только словами.** На двух последних
+  рефренах. Если он начнёт подкладывать «а-а» под первый голос, это ровно та
+  беда, на которую владелец жаловался; перегенерируй.
+- **Verse 4 почти шёпотом.** «Тепер устану» здесь — самое тихое место песни, а
+  не кульминация. Это весь смысл варианта.
+- **Проигрыш после второго рефрена размечен `no vocals`, песня закрыта `[End]`** —
+  в камерной аранжировке хвост особенно тянет на распевку.
+- **Длина.** Одиннадцать коротких секций, ожидаемо 3:00–3:20. Если режет — убрать
+  третий рефрен (после Verse 3), но тогда пропадает шаг «один голос → два
+  голоса», и укорочение строф читается хуже.

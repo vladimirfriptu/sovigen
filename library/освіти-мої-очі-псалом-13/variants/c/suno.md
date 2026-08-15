@@ -2,47 +2,56 @@
 song: освіти-мої-очі-псалом-13
 artifact: suno
 variant: c
-style: king-and-country
+style: bad-omens
 ---
 
-# Освіти мої очі (Псалом 13) — вариант c — генерация в Suno
+# Освіти мої очі (Псалом 13) — генерация в Suno, вариант `c`
 
 ## Style
 
 ```
-cinematic pop-rock, 4/4 at 84 BPM with a marching feel, driving tribal
-percussion, big taiko-style drums, layered male lead with brother-duo harmonies
-on the chorus only, orchestral strings under a modern pop structure, dramatic
-dynamic drops before every chorus, an abrupt full stop late in the song, final
-section with no drums at all — voice and sustained strings only, quieter than
-anything before it, clean straight-tone vocal, syllabic delivery (one note per
-syllable), restrained on-the-beat phrasing, no runs, no ad-libs
+dark alternative metal in Ukrainian, 4/4 at 84 BPM, down-tuned guitars with
+thick low-end, live drums forward in the mix, atmospheric pads behind the band
+and never in front of it, male lead singing clean throughout with a hard
+pressed delivery in the heavy sections and a soft even tone in the clean
+chorus, hard sections and clean sections never blended, chorus drops almost all
+distortion, quoted lines delivered flat and spoken-close rather than shouted,
+every sung sound is a written word, no vocalizations, no vocal fills between
+lines, silence where there are no lyrics, clean straight-tone vocal, syllabic
+delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no
+ad-libs, the song ends quieter than it began, final section is one clean guitar
+and one voice
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums,
-gospel choir, triumphant final chorus, fade-out ending, key change
+spontaneous worship, oversinging, vocal improvisation, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah,
+hey hey, oh oh, ah ah, eh eh, screamed vocals, harsh vocals, growl, death
+growl, unclean vocals, metalcore breakdown chant, gang vocals, crowd vocals,
+crowd noise, live audience, audience shouts, hey shouts, wordless backing
+vocals, background vocalizations, chanting, vocal pads, trip-hop, downtempo,
+programmed beat, Rhodes piano, gospel choir, orchestral strings, triumphant
+outro, big finish
 ```
 
 ## Советы по генерации
 
-84 BPM в 4/4 с маршевой опорой — единственный из трёх вариантов, который идёт
-шагом. Ожидаемая длина 3:00–3:20, из всех трёх он ближе всего к обрезке.
-
-Провал дубля — перкуссия поверх текста. Куплеты здесь несут содержание, и если
-слов не разобрать, дубль негоден независимо от того, как звучит припев. Карточка
-об этом прямо предупреждает.
-
-Второй маркер, специфичный для этого варианта: последний припев должен
-оборваться на «Я подолав» — на полуслове, без разрешения. Suno почти наверняка
-попытается его допеть и вывести в триумфальный финал; `triumphant final chorus`
-в Exclude ровно за этим. Если припев допет — приём варианта не сработал.
-
-Третий: `[Outro]` обязан идти без барабанов. Если они там остались, тишины, ради
-которой построена вся песня, не будет.
-
-Если режет по длине — убирай второй `[Pre-Chorus]`. Ни `[Bridge]`, ни `[Outro]`
-трогать нельзя: там ст. 4 и ст. 6, то есть просьба и ответ.
+- Ориентир — **Bad Omens** (низкий строй, контраст чистого и жёсткого,
+  атмосферные подкладки). Имя группы в `Style` не пишем.
+- 84 BPM, 4/4, тяжело и медленно. Это далёкий полюс набора, и он законен:
+  отвергнут был не тяжёлый звук, а программированный бит без живого бэнда
+  (см. `knowledge/styles/antistyles.md`). Барабанщик и гитары здесь обязаны быть
+  слышны как игра людей — `trip-hop, downtempo, programmed beat` стоят в Exclude
+  именно поэтому, резать их нельзя.
+- **Скрима и гроула нет намеренно.** Жёсткость даётся плотностью гитар и
+  подачей; если Suno зарычит, текст перестанет быть слышен, а весь вариант
+  держится на том, что слышна прямая речь врага.
+- Длина: два круга куплет-предприпев-припев, бридж и аутро — около трёх минут.
+  Если обрежет, убирать второй `[Pre-Chorus]`, а не припев.
+- **Что делает дубль неудачным:** громкий финал. После бриджа всё обязано
+  обвалиться до одной чистой гитары, и последние две строки — самое тихое место
+  песни. Услышал, что аутро вытягивают в кульминацию — дубль мимо, дослушивать
+  незачем.

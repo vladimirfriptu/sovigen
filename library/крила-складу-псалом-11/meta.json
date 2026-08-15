@@ -11,48 +11,49 @@
   "variants": [
     {
       "id": "a",
-      "style": "intimate-folk",
-      "angle": "тот, кому советуют бежать — ночью, сам с собой"
+      "style": "bad-omens",
+      "angle": "той, у кого основа розсипалась під ногами (ст. 2–3)"
     },
     {
       "id": "b",
-      "style": "lauren-daigle",
-      "angle": "друг, который уговаривает бежать"
+      "style": "casting-crowns",
+      "angle": "той, кому радять тікати: розмова з другом"
     },
     {
       "id": "c",
-      "style": "king-and-country",
-      "angle": "взгляд с престола, без человека в кадре"
+      "style": "imagine-dragons",
+      "angle": "свідок небесного суду (ст. 4–7)"
     },
     {
       "id": "d",
-      "style": "youth-guitar",
-      "angle": "«ми» — ті, у кого підвалини зруйновані"
+      "style": "hillsong",
+      "angle": "громада, що співає свій сховок уголос (ст. 1а)"
     },
     {
       "id": "e",
-      "style": "experiment-trip-hop-noir",
-      "angle": "стрілець із ст. 2 — той, хто чекає в темряві"
-    },
-    {
-      "id": "f",
-      "style": "experiment-skillet",
-      "angle": "той, кого випробовують — і не він один"
-    },
-    {
-      "id": "g",
-      "style": "youth-guitar",
-      "angle": "ті, хто лишається поруч — звернення на «ти»"
-    },
-    {
-      "id": "h",
-      "style": "youth-guitar",
-      "angle": "ті, хто лишився до кінця вечора — спокійна, мелодійна"
+      "style": "cinematic-orchestral",
+      "angle": "один із «синів людських» під поглядом (ст. 4 ↔ 7)"
     }
   ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    },
     {
       "stage": "idea",
       "at": "2026-08-15"

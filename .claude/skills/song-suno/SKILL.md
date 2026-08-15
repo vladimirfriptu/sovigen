@@ -112,4 +112,6 @@ Create a todo per variant and work through them in order.
 - Never write a root `suno.md` — that file belongs to `just choose`.
 - Do not run `just choose`, `just import` or `just advance` past `prompted`
   here — the choice is the user's, and `recorded` needs a real `track.mp3`.
-- Don't commit anything.
+- **Commit and push when the stage is done** — every iteration ends in the
+  remote, because the owner reads `library/` in Obsidian on his phone and the
+  repository is the only sync channel. See the project `CLAUDE.md`.

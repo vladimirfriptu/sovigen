@@ -136,11 +136,14 @@ Three costumes on one song are not worth comparing. Every set of three must
 satisfy all of these, and the check happens before a single line of lyrics is
 written:
 
-- **Pick in the order set by [[styles/references]].** The owner's own listening
-  list comes first, then the existing cards, and experiments outside both only
-  after the offered variants failed him. A set of three where nothing comes from
-  his references is wrong before it is written — that mistake cost seven
-  variants on Psalm 10.
+- **Pick in the order set by [[styles/references]], and mind its two tiers.**
+  A default set of three is built entirely from tier 1 — calm, bright, solemn.
+  **Rock (tier 2) is the second pass on a song, not the far pole of the first.**
+  A set where nothing comes from the owner's references is wrong before it is
+  written; a first set carrying two rock variants is wrong the same way.
+- **The far pole inside a tier-1 set is a difference of scale, not of genre** —
+  chamber against symphonic, one voice against a full band. Do not reach for
+  heaviness to make the set diverge.
 - **Different style cards.** Repeating a card inside one song is forbidden.
 - **Different angle** — whose eyes the psalm is seen through (the victim, a
   witness, an accuser, the one who waits, …).
@@ -161,4 +164,6 @@ written:
   made on audio, after Suno — see `song`.
 - Do not write a single line of lyrics in this skill.
 - The user never edits files. You write, they react in words.
-- Don't commit anything (project policy: wait for an explicit signal).
+- **Commit and push when the stage is done** — every iteration ends in the
+  remote, because the owner reads `library/` in Obsidian on his phone and the
+  repository is the only sync channel. See the project `CLAUDE.md`.

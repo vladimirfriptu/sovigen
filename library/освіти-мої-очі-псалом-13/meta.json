@@ -11,23 +11,49 @@
   "variants": [
     {
       "id": "a",
-      "style": "intimate-folk",
-      "angle": "тот, кто не спит четвёртую ночь: изнутри, наедине"
+      "style": "ruah",
+      "angle": "тот, кто молится один ночью и считает дни"
     },
     {
       "id": "b",
-      "style": "youth-guitar",
-      "angle": "те, кто рядом: компания задаёт вопрос за него"
+      "style": "imagine-dragons",
+      "angle": "тело, которое гаснет: глаза, сон, шатание"
     },
     {
       "id": "c",
-      "style": "king-and-country",
-      "angle": "враг, стоящий над упавшим, и голос, который у него это отбирает"
+      "style": "bad-omens",
+      "angle": "человек в осаде, слышащий торжество врага"
+    },
+    {
+      "id": "d",
+      "style": "hillsong",
+      "angle": "зал, що питає «доки» вголос; розворот віддано одному голосу"
+    },
+    {
+      "id": "e",
+      "style": "cinematic-orchestral",
+      "angle": "хор тих, хто питав це раніше"
     }
   ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    },
     {
       "stage": "idea",
       "at": "2026-08-15"
