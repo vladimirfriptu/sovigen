@@ -23,6 +23,31 @@
       "id": "c",
       "style": "king-and-country",
       "angle": "взгляд с престола, без человека в кадре"
+    },
+    {
+      "id": "d",
+      "style": "youth-guitar",
+      "angle": "«ми» — ті, у кого підвалини зруйновані"
+    },
+    {
+      "id": "e",
+      "style": "experiment-trip-hop-noir",
+      "angle": "стрілець із ст. 2 — той, хто чекає в темряві"
+    },
+    {
+      "id": "f",
+      "style": "experiment-skillet",
+      "angle": "той, кого випробовують — і не він один"
+    },
+    {
+      "id": "g",
+      "style": "youth-guitar",
+      "angle": "ті, хто лишається поруч — звернення на «ти»"
+    },
+    {
+      "id": "h",
+      "style": "youth-guitar",
+      "angle": "ті, хто лишився до кінця вечора — спокійна, мелодійна"
     }
   ],
   "chosen_variant": null,

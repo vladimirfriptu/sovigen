@@ -20,6 +20,10 @@ exist yet, that is the `song` orchestrator's job — do not create it here.
 Read, and only these:
 
 - `knowledge/role.md` — the two formats, the default, how a style gets chosen.
+- `knowledge/styles/references.md` — **the owner's own listening list and the
+  order styles must be picked in.** Read it before shortlisting anything.
+- `knowledge/styles/antistyles.md` — styles closed by the owner's own words.
+  Never propose one, not even as the far pole.
 - `knowledge/craft/lyrics.md` — sources, Hebrew numbering, honesty about
   deviations, the "gifts of the text".
 - `knowledge/series/<series>.md` for the song's `series` from `meta.json`
@@ -132,6 +136,11 @@ Three costumes on one song are not worth comparing. Every set of three must
 satisfy all of these, and the check happens before a single line of lyrics is
 written:
 
+- **Pick in the order set by [[styles/references]].** The owner's own listening
+  list comes first, then the existing cards, and experiments outside both only
+  after the offered variants failed him. A set of three where nothing comes from
+  his references is wrong before it is written — that mistake cost seven
+  variants on Psalm 10.
 - **Different style cards.** Repeating a card inside one song is forbidden.
 - **Different angle** — whose eyes the psalm is seen through (the victim, a
   witness, an accuser, the one who waits, …).

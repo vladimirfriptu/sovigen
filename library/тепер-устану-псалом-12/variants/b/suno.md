@@ -12,21 +12,28 @@ style: youth-guitar
 ```
 acoustic guitar singalong, 4/4 at 112 BPM, driving downstroke strumming on a
 bright capo'd acoustic guitar in a minor key that opens to major on the chorus,
-warm male mid-range lead singing plainly, unison group vocals joining on every
-chorus and growing louder each time, light cajon and hand percussion only,
-simple three-chord harmony, live take feel as if recorded in one room with
-several people, no studio polish, clean straight-tone vocal, syllabic delivery
-(one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs
+warm male mid-range lead singing plainly, group vocals singing the written lyrics
+in unison on every chorus and growing louder each time, words only, no wordless
+backing vocals, no crowd noise between lines, every sung sound is a written word,
+no vocalizations, no vocal fills between lines, silence where there are no lyrics,
+light cajon and hand percussion only, simple three-chord harmony, live take feel
+as if recorded in one room with several people, no studio polish, clean
+straight-tone vocal, syllabic delivery (one note per syllable), restrained
+on-the-beat phrasing, no runs, no ad-libs
 ```
 
 ## Exclude Styles
 
 ```
 melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants,
-spontaneous worship, oversinging, vocal improvisation, EDM, trap drums,
-electronic drums, autotune, processed vocals, stadium reverb, arena anthem,
-pop production, electric guitar solo, orchestral strings, gospel choir,
-children's choir, country, americana, ska, punk, double-time
+spontaneous worship, oversinging, vocal improvisation, EDM, trap drums, electronic
+drums, autotune, processed vocals, stadium reverb, arena anthem, pop production,
+electric guitar solo, orchestral strings, gospel choir, children's choir, country,
+americana, ska, punk, double-time, crowd vocals, crowd noise, live audience,
+audience shouts, hey shouts, wordless backing vocals, background vocalizations,
+chanting, football chant, la-la-la vocals, vocal pads, vocalizations, vocalise,
+scat singing, vocal fills, improvised vocal tail, outro vocalizing, yeah yeah, hey
+hey, oh oh, ah ah, eh eh
 ```
 
 ## Советы по генерации

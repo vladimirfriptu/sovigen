@@ -8,6 +8,7 @@ language: uk
 
 # Тепер устану (Псалом 12) — вариант a, текст
 
+```
 [Intro: instrumental only, no vocals]
 
 [Verse 1: intimate]
@@ -53,6 +54,7 @@ language: uk
 відтепер лежить те слово.
 
 [Outro: fingerpicked guitar and dulcimer only, no vocals]
+```
 
 ## Соответствие источнику
 
