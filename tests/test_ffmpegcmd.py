@@ -80,3 +80,14 @@ def test_spectrum_cmd_pins_the_colour_range():
     cmd = build_spectrum_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("out.mp4"), 217.0)
     assert "tv" in cmd
     assert "out_range=tv" in _filter_graph(cmd)
+
+
+def test_static_cmd_pins_the_colour_range():
+    # A JPEG cover decodes as full-range yuvj420p and that flag leaks into the
+    # stream, shifting contrast in some players. The static path must clamp the
+    # range the same way the spectrum path already does.
+    cmd = build_static_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("out.mp4"))
+    joined = " ".join(cmd)
+    assert "out_range=tv" in joined
+    assert "-color_range" in cmd
+    assert "-pix_fmt" in cmd

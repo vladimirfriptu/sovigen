@@ -1,7 +1,11 @@
 from pathlib import Path
 
+# in_range=auto, not full: a JPEG cover decodes as full-range yuvj420p, a PNG as
+# RGB, and only the JPEG needs compressing to tv levels. Forcing full would wash
+# out every PNG cover the library already has.
 VIDEO_FILTER = (
-    "scale=1920:1080:force_original_aspect_ratio=decrease,"
+    "scale=1920:1080:force_original_aspect_ratio=decrease"
+    ":in_range=auto:out_range=tv,"
     "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=black,"
     "format=yuv420p"
 )
@@ -20,6 +24,8 @@ def build_static_video_cmd(image: Path, audio: Path, output: Path) -> list:
         "-c:v", "libx264",
         "-tune", "stillimage",
         "-r", "24",
+        "-pix_fmt", "yuv420p",
+        "-color_range", "tv",
         "-c:a", "aac",
         "-b:a", "320k",
         "-shortest",
