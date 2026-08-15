@@ -2,12 +2,12 @@
   "meta_version": 3,
   "title": "Цар навіки віків",
   "slug": "цар-навіки-віків",
-  "stage": "idea",
+  "stage": "published",
   "created": "2026-08-14",
   "source": "psalm-10",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-guitar",
   "suno_takes": 0,
   "stage_history": [
     {
@@ -29,8 +29,73 @@
     {
       "stage": "idea",
       "at": "2026-08-14"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-14"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "published",
+      "at": "2026-08-15"
     }
   ],
-  "variants": [],
-  "chosen_variant": null
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "сирота — той, за кого нікому сказати"
+    },
+    {
+      "id": "b",
+      "style": "casting-crowns",
+      "angle": "свідок кривди — бачить і не може зупинити"
+    },
+    {
+      "id": "c",
+      "style": "cinematic-orchestral",
+      "angle": "обвинувач — читає обвинення, а не скаржиться"
+    },
+    {
+      "id": "d",
+      "style": "experiment-kobzar-duma",
+      "angle": "кобзар — свідчить, щоб не забулося"
+    },
+    {
+      "id": "e",
+      "style": "experiment-trip-hop-noir",
+      "angle": "нечестивий — псалом ізсередини його голови"
+    },
+    {
+      "id": "f",
+      "style": "experiment-holosinnia-polyphony",
+      "angle": "голосільниця — плач над відібраним"
+    },
+    {
+      "id": "g",
+      "style": "youth-guitar",
+      "angle": "«ми» — компанія, що співає це разом"
+    }
+  ],
+  "chosen_variant": "g",
+  "video_style": "static"
 }
