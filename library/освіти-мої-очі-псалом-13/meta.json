@@ -1,0 +1,48 @@
+{
+  "meta_version": 3,
+  "title": "Освіти мої очі (Псалом 13)",
+  "slug": "освіти-мої-очі-псалом-13",
+  "stage": "prompted",
+  "created": "2026-08-15",
+  "source": "psalm-13",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "тот, кто не спит четвёртую ночь: изнутри, наедине"
+    },
+    {
+      "id": "b",
+      "style": "youth-guitar",
+      "angle": "те, кто рядом: компания задаёт вопрос за него"
+    },
+    {
+      "id": "c",
+      "style": "king-and-country",
+      "angle": "враг, стоящий над упавшим, и голос, который у него это отбирает"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    }
+  ]
+}

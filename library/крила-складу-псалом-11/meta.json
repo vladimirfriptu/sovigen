@@ -1,0 +1,48 @@
+{
+  "meta_version": 3,
+  "title": "Крила складу (Псалом 11)",
+  "slug": "крила-складу-псалом-11",
+  "stage": "prompted",
+  "created": "2026-08-15",
+  "source": "psalm-11",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "тот, кому советуют бежать — ночью, сам с собой"
+    },
+    {
+      "id": "b",
+      "style": "lauren-daigle",
+      "angle": "друг, который уговаривает бежать"
+    },
+    {
+      "id": "c",
+      "style": "king-and-country",
+      "angle": "взгляд с престола, без человека в кадре"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    }
+  ]
+}

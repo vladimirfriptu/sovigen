@@ -1,0 +1,48 @@
+{
+  "meta_version": 3,
+  "title": "Тепер устану (Псалом 12)",
+  "slug": "тепер-устану-псалом-12",
+  "stage": "prompted",
+  "created": "2026-08-15",
+  "source": "psalm-12",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "последний оставшийся верным, считает потери"
+    },
+    {
+      "id": "b",
+      "style": "youth-guitar",
+      "angle": "«мы» — компания, перепевающая хвастовство словами Бога"
+    },
+    {
+      "id": "c",
+      "style": "king-and-country",
+      "angle": "свидетель у горнила, где переплавляют речь"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-08-15"
+    }
+  ]
+}

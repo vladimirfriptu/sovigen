@@ -51,7 +51,12 @@ is visible. Then work through them.
    title with no folder): the slug is permanent and the folder cannot be
    renamed later, so do not invent a title silently. Propose two or three
    titles in one short message and ask which one. That is a naming question,
-   not a content checkpoint — keep it to one message. Then create it:
+   not a content checkpoint — keep it to one message.
+
+   **For a psalm, the number must end up in the slug.** Put it in the title as
+   a bracket — «Не полечу (Псалом 11)» → `не-полечу-псалом-11` — `slugify`
+   carries it over on its own. See the naming rule in
+   `knowledge/series/psalms.md` for why. Then create it:
 
    ```bash
    just new "<Название>" --source psalm-23 --series psalms
