@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Крила складу (Псалом 11)",
   "slug": "крила-складу-псалом-11",
-  "stage": "recorded",
+  "stage": "pre-published",
   "created": "2026-08-15",
   "source": "psalm-11",
   "series": "psalms",
@@ -73,6 +73,15 @@
     {
       "stage": "recorded",
       "at": "2026-08-15"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-08-15"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-08-15"
     }
-  ]
+  ],
+  "video_style": "static"
 }
