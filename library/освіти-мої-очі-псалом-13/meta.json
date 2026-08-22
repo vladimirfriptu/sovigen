@@ -33,6 +33,21 @@
       "id": "e",
       "style": "cinematic-orchestral",
       "angle": "хор тих, хто питав це раніше"
+    },
+    {
+      "id": "f",
+      "style": "epic-hybrid-orchestral",
+      "angle": "тот, кто идёт сквозь ночь и считает шаги"
+    },
+    {
+      "id": "g",
+      "style": "lauren-daigle",
+      "angle": "разговор с Тем, кто в комнате и молчит"
+    },
+    {
+      "id": "h",
+      "style": "newsboys",
+      "angle": "нетерпение утром, вслух и на ходу"
     }
   ],
   "chosen_variant": null,
