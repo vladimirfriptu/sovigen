@@ -47,19 +47,28 @@ is visible. Then work through them.
    step is, then continue from that stage in step 4. Never restart a stage that
    is already behind.
 
-   **It does not exist** (the user names a theme — «песня по Псалму 23» — or a
-   title with no folder): the slug is permanent and the folder cannot be
-   renamed later, so do not invent a title silently. Propose two or three
-   titles in one short message and ask which one. That is a naming question,
-   not a content checkpoint — keep it to one message.
+   **It does not exist.**
 
-   **For a psalm, the number must end up in the slug.** Put it in the title as
-   a bracket — «Не полечу (Псалом 11)» → `не-полечу-псалом-11` — `slugify`
-   carries it over on its own. See the naming rule in
-   `knowledge/series/psalms.md` for why. Then create it:
+   **For a psalm the folder is named by the number and nothing else — never
+   ask.** «песня по Псалму 23» → title `Псалом 23`, slug `псалом-23`:
 
    ```bash
-   just new "<Название>" --source psalm-23 --series psalms
+   just new "Псалом 23" --source psalm-23 --series psalms
+   ```
+
+   The folder name is an address, not a title. A poetic name belongs to the
+   published video and is written in `youtube.md` at release time, where it can
+   still change; a slug cannot. Asking the owner to name a song before its
+   three variants exist is asking him to choose blind — so do not, and do not
+   offer alternatives «just in case». See `knowledge/series/psalms.md`.
+
+   **For a song outside the psalms series** (the user names a theme with no
+   folder), the title is the folder name and cannot be renamed later — propose
+   two or three in one short message and ask which. That is a naming question,
+   not a content checkpoint; keep it to one message.
+
+   ```bash
+   just new "<Название>" --source <source> --series <series>
    ```
 
    `--language` defaults to `uk`. The command creates `library/<slug>/` at
