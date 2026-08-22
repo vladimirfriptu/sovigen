@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 14",
   "slug": "псалом-14",
-  "stage": "brief",
+  "stage": "prompted",
   "created": "2026-08-22",
   "source": "psalm-14",
   "series": "psalms",
@@ -34,6 +34,14 @@
     },
     {
       "stage": "brief",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "prompted",
       "at": "2026-08-22"
     }
   ]
