@@ -2,18 +2,38 @@
   "meta_version": 3,
   "title": "Псалом 14",
   "slug": "псалом-14",
-  "stage": "idea",
+  "stage": "brief",
   "created": "2026-08-22",
   "source": "psalm-14",
   "series": "psalms",
   "language": "uk",
   "style": null,
-  "variants": [],
+  "variants": [
+    {
+      "id": "a",
+      "style": "ruah",
+      "angle": "взгляд с небес из ст. 2 — тот, кто ищет и не находит"
+    },
+    {
+      "id": "b",
+      "style": "cinematic-orchestral",
+      "angle": "земля, увиденная целиком: «усі» из ст. 3"
+    },
+    {
+      "id": "c",
+      "style": "intimate-folk",
+      "angle": "вбогий зі ст. 6, он же хліб зі ст. 4"
+    }
+  ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
     {
       "stage": "idea",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "brief",
       "at": "2026-08-22"
     }
   ]
