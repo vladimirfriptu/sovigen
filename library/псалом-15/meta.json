@@ -2,18 +2,46 @@
   "meta_version": 3,
   "title": "Псалом 15",
   "slug": "псалом-15",
-  "stage": "idea",
+  "stage": "prompted",
   "created": "2026-08-22",
   "source": "psalm-15",
   "series": "psalms",
   "language": "uk",
   "style": null,
-  "variants": [],
+  "variants": [
+    {
+      "id": "a",
+      "style": "chris-tomlin",
+      "angle": "паломник, який іде вгору і питає біля брами ззовні"
+    },
+    {
+      "id": "b",
+      "style": "king-and-country",
+      "angle": "голос біля брами, що читає умову вголос над тими, хто внизу"
+    },
+    {
+      "id": "c",
+      "style": "lauren-daigle",
+      "angle": "людина зі ст. 4в, що поклялася на зло собі й не змінила слова"
+    }
+  ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
     {
       "stage": "idea",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-08-22"
+    },
+    {
+      "stage": "prompted",
       "at": "2026-08-22"
     }
   ]
