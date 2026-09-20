@@ -2,13 +2,29 @@
   "meta_version": 3,
   "title": "Освіти мої очі (Псалом 13)",
   "slug": "освіти-мої-очі-псалом-13",
-  "stage": "idea",
+  "stage": "prompted",
   "created": "2026-08-15",
   "source": "psalm-13",
   "series": "psalms",
   "language": "uk",
   "style": null,
-  "variants": [],
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "человек, который каждый день придумывает новый способ спасти себя"
+    },
+    {
+      "id": "b",
+      "style": "casting-crowns",
+      "angle": "молящийся держится за три коротких глагола, когда уже шатается"
+    },
+    {
+      "id": "c",
+      "style": "chris-tomlin",
+      "angle": "человек заранее разучивает песню, которую решил спеть до ответа"
+    }
+  ],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
@@ -46,6 +62,18 @@
     },
     {
       "stage": "idea",
+      "at": "2026-09-20"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-09-20"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-09-20"
+    },
+    {
+      "stage": "prompted",
       "at": "2026-09-20"
     }
   ]
