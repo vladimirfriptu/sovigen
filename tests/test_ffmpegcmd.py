@@ -8,7 +8,9 @@ from sovigen.ffmpegcmd import (
 
 
 def test_cmd_starts_with_ffmpeg_and_inputs():
-    cmd = build_static_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("out.mp4"))
+    cmd = build_static_video_cmd(
+        Path("c.jpg"), Path("t.mp3"), Path("out.mp4"), 217.0
+    )
     assert cmd[0] == "ffmpeg"
     assert "c.jpg" in cmd
     assert "t.mp3" in cmd
@@ -16,13 +18,16 @@ def test_cmd_starts_with_ffmpeg_and_inputs():
 
 
 def test_cmd_has_youtube_encoding_flags():
-    cmd = build_static_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("out.mp4"))
+    cmd = build_static_video_cmd(
+        Path("c.jpg"), Path("t.mp3"), Path("out.mp4"), 217.0
+    )
     joined = " ".join(cmd)
     assert "libx264" in cmd
     assert "stillimage" in cmd
     assert "aac" in cmd
     assert "320k" in cmd
     assert "-shortest" in cmd
+    assert cmd[cmd.index("-t") + 1] == "217.0"
     assert "1920:1080" in joined
     assert "yuv420p" in joined
 
@@ -67,7 +72,9 @@ def test_spectrum_cmd_converts_to_yuv_only_at_the_end():
 
 
 def test_static_and_spectrum_write_the_same_output_name():
-    static = build_static_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("o.mp4"))
+    static = build_static_video_cmd(
+        Path("c.jpg"), Path("t.mp3"), Path("o.mp4"), 1.0
+    )
     spectrum = build_spectrum_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("o.mp4"), 1.0)
     assert static[-1] == spectrum[-1]
 
@@ -86,7 +93,9 @@ def test_static_cmd_pins_the_colour_range():
     # A JPEG cover decodes as full-range yuvj420p and that flag leaks into the
     # stream, shifting contrast in some players. The static path must clamp the
     # range the same way the spectrum path already does.
-    cmd = build_static_video_cmd(Path("c.jpg"), Path("t.mp3"), Path("out.mp4"))
+    cmd = build_static_video_cmd(
+        Path("c.jpg"), Path("t.mp3"), Path("out.mp4"), 217.0
+    )
     joined = " ".join(cmd)
     assert "out_range=tv" in joined
     assert "-color_range" in cmd

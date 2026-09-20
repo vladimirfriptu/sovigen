@@ -75,11 +75,11 @@ def cmd_build(slug: str, viz: bool = False) -> Path:
     image = find_image(sdir)
     audio = find_audio(sdir)
     style = VIDEO_STYLE_SPECTRUM if viz else data.get("video_style", VIDEO_STYLE_STATIC)
+    duration = _probe_duration(slug, audio)
     if style == VIDEO_STYLE_SPECTRUM:
-        duration = _probe_duration(slug, audio)
         cmd = build_spectrum_video_cmd(image, audio, output, duration)
     else:
-        cmd = build_static_video_cmd(image, audio, output)
+        cmd = build_static_video_cmd(image, audio, output, duration)
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise CommandError(f"ffmpeg failed for {slug}:\n{result.stderr}")

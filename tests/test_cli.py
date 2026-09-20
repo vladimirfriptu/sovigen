@@ -39,11 +39,13 @@ def test_full_flow(lib, monkeypatch, capsys):
     assert meta.read_meta(sdir)["stage"] == "ready"
 
     def fake_run(cmd, capture_output=True, text=True):
-        open(cmd[-1], "wb").close()
-
         class R:
             returncode = 0
             stderr = ""
+            stdout = "217.0\n" if cmd[0] == "ffprobe" else ""
+
+        if cmd[0] != "ffprobe":
+            open(cmd[-1], "wb").close()
 
         return R()
 
@@ -108,11 +110,13 @@ def test_advance_missing_file_exits_nonzero(lib, capsys):
 def test_import_then_advance_walks_the_whole_pipeline(lib, tmp_path, monkeypatch,
                                                       capsys):
     def fake_run(cmd, capture_output=True, text=True):
-        open(cmd[-1], "wb").close()
-
         class R:
             returncode = 0
             stderr = ""
+            stdout = "217.0\n" if cmd[0] == "ffprobe" else ""
+
+        if cmd[0] != "ffprobe":
+            open(cmd[-1], "wb").close()
 
         return R()
 

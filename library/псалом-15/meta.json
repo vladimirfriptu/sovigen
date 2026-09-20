@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 15",
   "slug": "псалом-15",
-  "stage": "recorded",
+  "stage": "pre-published",
   "created": "2026-08-22",
   "source": "psalm-15",
   "series": "psalms",
@@ -67,6 +67,15 @@
     {
       "stage": "recorded",
       "at": "2026-09-20"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-09-20"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-09-20"
     }
-  ]
+  ],
+  "video_style": "static"
 }

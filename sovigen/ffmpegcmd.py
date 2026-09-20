@@ -13,7 +13,9 @@ VIDEO_FILTER = (
 ACCENT = "0xE8B96A"
 
 
-def build_static_video_cmd(image: Path, audio: Path, output: Path) -> list:
+def build_static_video_cmd(
+    image: Path, audio: Path, output: Path, duration: float
+) -> list:
     return [
         "ffmpeg",
         "-loop", "1",
@@ -28,6 +30,7 @@ def build_static_video_cmd(image: Path, audio: Path, output: Path) -> list:
         "-color_range", "tv",
         "-c:a", "aac",
         "-b:a", "320k",
+        "-t", str(duration),
         "-shortest",
         "-movflags", "+faststart",
         "-y",

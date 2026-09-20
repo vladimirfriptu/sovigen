@@ -25,13 +25,13 @@ def _make_song(lib, slug, stage="idea", with_inputs=True):
 
 def _fake_ffmpeg_ok(monkeypatch):
     def fake_run(cmd, capture_output=True, text=True):
-        output = cmd[-1]
-        open(output, "wb").close()
-
         class R:
             returncode = 0
             stderr = ""
+            stdout = "217.0\n" if cmd[0] == "ffprobe" else ""
 
+        if cmd[0] != "ffprobe":
+            open(cmd[-1], "wb").close()
         return R()
 
     monkeypatch.setattr(subprocess, "run", fake_run)
@@ -437,8 +437,10 @@ def test_build_without_viz_stays_a_still_image(lib, monkeypatch):
     _make_song(lib, "plain", stage="ready")
     calls = _fake_ffmpeg_and_ffprobe(monkeypatch)
     commands.cmd_build("plain")
-    assert all(cmd[0] != "ffprobe" for cmd in calls)
-    assert "showfreqs" not in " ".join(calls[0])
+    assert any(cmd[0] == "ffprobe" for cmd in calls)
+    ffmpeg_cmd = [cmd for cmd in calls if cmd[0] == "ffmpeg"][0]
+    assert "showfreqs" not in " ".join(ffmpeg_cmd)
+    assert ffmpeg_cmd[ffmpeg_cmd.index("-t") + 1] == "217.0"
     assert meta.read_meta(lib / "plain").get("video_style", "static") == "static"
 
 
