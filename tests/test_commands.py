@@ -290,6 +290,16 @@ def test_import_audio_to_canonical_name(lib, tmp_path):
     assert dest.read_bytes() == b"audio"
 
 
+@pytest.mark.parametrize("extension", [".m4a", ".wav"])
+def test_import_audio_keeps_supported_extension(lib, tmp_path, extension):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    src = tmp_path / f"Suno take{extension}"
+    src.write_bytes(b"audio")
+    dest = commands.cmd_import("s", src)
+    assert dest == sdir / f"track{extension}"
+    assert dest.read_bytes() == b"audio"
+
+
 def test_import_keeps_source_file(lib, tmp_path):
     _make_song(lib, "s", stage="prompted", with_inputs=False)
     src = tmp_path / "take.mp3"
@@ -312,6 +322,16 @@ def test_import_moves_previous_file_to_raw(lib, tmp_path):
     src.write_bytes(b"new")
     commands.cmd_import("s", src)
     assert (sdir / "track.mp3").read_bytes() == b"new"
+    assert (sdir / "raw" / "track.mp3").read_bytes() == b"old"
+
+
+def test_import_audio_stashes_previous_audio_of_another_format(lib, tmp_path):
+    sdir = _make_song(lib, "s", stage="prompted", with_inputs=False)
+    (sdir / "track.mp3").write_bytes(b"old")
+    src = tmp_path / "new.wav"
+    src.write_bytes(b"new")
+    assert commands.cmd_import("s", src) == sdir / "track.wav"
+    assert (sdir / "track.wav").read_bytes() == b"new"
     assert (sdir / "raw" / "track.mp3").read_bytes() == b"old"
 
 

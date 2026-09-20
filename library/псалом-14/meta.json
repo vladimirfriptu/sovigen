@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 14",
   "slug": "псалом-14",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-08-22",
   "source": "psalm-14",
   "series": "psalms",
@@ -68,6 +68,10 @@
     {
       "stage": "prompted",
       "at": "2026-08-22"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-09-20"
     }
   ]
 }

@@ -36,8 +36,9 @@ Create a todo per step and work through them in order.
      track yet; hand it to the `song` skill instead.
 
 3. **Verify inputs are present in the song folder root.**
-   - Exactly one `*.mp3` and exactly one image (`*.jpg/.jpeg/.png/.webp`)
-     directly in `library/<slug>/` (files in `raw/` don't count).
+   - Exactly one audio file (`*.wav/.m4a/.mp3`) and exactly one image
+     (`*.jpg/.jpeg/.png/.webp`) directly in `library/<slug>/` (files in `raw/`
+     don't count).
    - If more than one of either: ask WHICH file to keep — that is a choice,
      not a chore — and then do the moving yourself. `just import <slug> <path>`
      installs the keeper under its canonical name and stashes the previous one

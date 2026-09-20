@@ -129,7 +129,7 @@ Create a todo per variant and work through them in order.
   apply, and a release intended for YouTube must be downloaded on a paid plan;
   free trial downloads are personal-use only.
 - Do not run `just choose`, `just import` or `just advance` past `prompted`
-  here — the choice is the user's, and `recorded` needs a real `track.mp3`.
+  here — the choice is the user's, and `recorded` needs a real audio file.
 - **Commit and push when the stage is done** — every iteration ends in the
   remote, because the owner reads `library/` in Obsidian on his phone and the
   repository is the only sync channel. See the project `CLAUDE.md`.

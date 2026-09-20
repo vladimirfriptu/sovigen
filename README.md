@@ -2,7 +2,7 @@
 
 Инструмент ведёт песню через восемь стадий — от идеи до публикации — и
 на последнем шаге собирает готовое видео для YouTube из **обложки**
-(картинка) и **песни** (mp3): картинка вписывается в кадр 1920×1080,
+(картинка) и **песни** (WAV, M4A или MP3): картинка вписывается в кадр 1920×1080,
 поверх ложится аудио, на выходе — `youtube.mp4`.
 
 Каждая песня — это постоянная папка `library/<slug>/`, а её состояние
@@ -12,7 +12,7 @@
 > **Что коммитится, а что нет.** Текст песни — `meta.json`, `brief.md`,
 > `lyrics.md`, `suno.md`, `cover-prompt.md`, `youtube.md`, `notes.md` —
 > версионируется в гите: у него есть история, и он приезжает на любую
-> машину простым `git pull`. Медиа — `track.mp3`, `cover.*`,
+> машину простым `git pull`. Медиа — `track.wav` / `track.m4a` / `track.mp3`, `cover.*`,
 > `youtube.mp4` — и черновая свалка `raw/` в гит не попадают
 > (см. `.gitignore`): они тяжёлые и раздули бы публичный репозиторий.
 > Долговременное хранение медиа — открытый вопрос, решения пока нет,
@@ -50,7 +50,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 ```
 
 `git clone` уже принесёт `library/` с текстами всех существующих песен
-(без медиа) — докачивать mp3/обложки/видео для уже опубликованных треков
+(без медиа) — докачивать аудио/обложки/видео для уже опубликованных треков
 не нужно, они появляются заново только для новой песни.
 
 ## Как устроен пайплайн
@@ -67,7 +67,7 @@ idea → brief → lyrics → prompted → recorded → ready → pre-published 
 | `brief` | `brief.md` написан — о чём песня | Claude |
 | `lyrics` | тексты готовы — по одному в каждом варианте | Claude |
 | `prompted` | промпты для Suno готовы — по одному в каждом варианте | вы (сгенерировать все варианты и выбрать) |
-| `recorded` | трек скачан и лежит в папке как `track.mp3` | Claude |
+| `recorded` | трек скачан и лежит в папке как `track.wav`, `track.m4a` или `track.mp3` | Claude |
 | `ready` | обложка и `youtube.md` готовы, можно собирать видео | Claude |
 | `pre-published` | `youtube.mp4` собран | вы (залить на YouTube) |
 | `published` | видео опубликовано | — |
@@ -100,7 +100,7 @@ library/<slug>/
   notes.md                  # свободные заметки
   raw/                      # черновая свалка (старые версии файлов, не в гите)
   cover.jpg | cover.png     # ровно одна обложка (.jpg/.jpeg/.png/.webp) — не в гите
-  track.mp3                 # аудиофайл — не в гите
+  track.wav | track.m4a | track.mp3  # один аудиофайл — не в гите
   youtube.mp4               # результат сборки (после build) — не в гите
 ```
 
@@ -122,9 +122,9 @@ just choose my-track-name b        # переносит вариант b в ко
                                    # (lyrics.md, suno.md), пишет chosen_variant
                                    # и style; стадию не двигает
 
-just import my-track ~/Downloads/take.mp3
+just import my-track ~/Downloads/take.wav
                                    # кладёт скачанный файл в папку песни под
-                                   # каноническим именем (track.mp3 / cover.*),
+                                   # каноническим именем (track.<ext> / cover.*),
                                    # прошлый файл того же типа уходит в raw/
 
 just build my-track-name           # собирает youtube.mp4, stage → pre-published
@@ -151,7 +151,7 @@ just status --json                 # то же самое в JSON
 ```bash
 python3 -m sovigen.cli new "My Track Name" [--source ...] [--series ...] [--language uk]
 python3 -m sovigen.cli advance my-track-name
-python3 -m sovigen.cli import my-track-name ~/Downloads/take.mp3
+python3 -m sovigen.cli import my-track-name ~/Downloads/take.wav
 python3 -m sovigen.cli build my-track-name
 python3 -m sovigen.cli build-all
 python3 -m sovigen.cli publish my-track-name

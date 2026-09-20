@@ -1,6 +1,8 @@
 from pathlib import Path
 
-AUDIO = "audio (.mp3)"
+from .inputs import AUDIO_LABEL
+
+AUDIO = AUDIO_LABEL
 IMAGE = "image"
 
 AUDIO_FILENAME = "track.mp3"

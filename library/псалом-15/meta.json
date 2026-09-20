@@ -2,12 +2,12 @@
   "meta_version": 3,
   "title": "Псалом 15",
   "slug": "псалом-15",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-08-22",
   "source": "psalm-15",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-guitar",
   "variants": [
     {
       "id": "a",
@@ -45,7 +45,7 @@
       "angle": "світлий енергійний поп-рок із триєдиним хуком про правду в серці, ділі й слові"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "d",
   "suno_takes": 0,
   "stage_history": [
     {
@@ -63,6 +63,10 @@
     {
       "stage": "prompted",
       "at": "2026-08-22"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-09-20"
     }
   ]
 }

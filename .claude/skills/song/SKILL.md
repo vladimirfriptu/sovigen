@@ -107,12 +107,12 @@ is visible. Then work through them.
    1. `just choose <slug> <id>` — copies that variant's `lyrics.md` and
       `suno.md` into the song root and records `chosen_variant` and `style`.
       Run it first: everything downstream reads the root files.
-   2. Find the audio file yourself. It is normally the freshest `.mp3` in
-      `~/Downloads`: `ls -t ~/Downloads/*.mp3 | head -5`. With three variants
+   2. Find the audio file yourself. It is normally the freshest `.wav`, `.m4a`
+      or `.mp3` in `~/Downloads`. With three variants
       generated there will be several fresh files — if more than one plausibly
       matches, show the candidates with their timestamps and ask which. Never
       guess between takes.
-   3. `just import <slug> <path>` — copies it in as `track.mp3` and moves any
+   3. `just import <slug> <path>` — copies it in as `track.<ext>` and moves any
       previous audio into `raw/` on its own. Never move or rename files by hand.
    4. `just advance <slug>` → `prompted -> recorded`. It refuses if no audio is
       present, which is the check that the import landed.

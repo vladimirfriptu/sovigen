@@ -206,7 +206,7 @@ def cmd_import(slug: str, src) -> Path:
         )
     ext = source.suffix.lower()
     if ext in AUDIO_EXTS:
-        dest = sdir / AUDIO_FILENAME
+        dest = sdir / f"{Path(AUDIO_FILENAME).stem}{ext}"
         exts = AUDIO_EXTS
     elif ext in IMAGE_EXTS:
         dest = sdir / f"cover{ext}"

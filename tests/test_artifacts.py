@@ -67,8 +67,10 @@ def test_missing_for_stage_empty_when_present(song):
 
 
 def test_missing_for_stage_audio_marker(song):
-    assert artifacts.missing_for_stage(song, "recorded") == ["audio (.mp3)"]
-    (song / "track.mp3").write_bytes(b"")
+    assert artifacts.missing_for_stage(song, "recorded") == [
+        "audio (.m4a/.mp3/.wav)"
+    ]
+    (song / "track.wav").write_bytes(b"")
     assert artifacts.missing_for_stage(song, "recorded") == []
 
 
@@ -88,7 +90,7 @@ def test_missing_for_stage_names_the_ambiguous_files(song):
 
 def test_missing_for_stage_ambiguous_audio_is_not_reported_as_absent(song):
     (song / "take-1.mp3").write_bytes(b"")
-    (song / "take-2.mp3").write_bytes(b"")
+    (song / "take-2.m4a").write_bytes(b"")
     reported = artifacts.missing_for_stage(song, "recorded")
     assert reported != [artifacts.AUDIO]
     assert "take-1.mp3" in reported[0]

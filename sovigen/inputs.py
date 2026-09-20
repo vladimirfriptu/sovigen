@@ -1,7 +1,9 @@
 from pathlib import Path
 
-AUDIO_EXTS = {".mp3"}
+AUDIO_EXTS = {".m4a", ".mp3", ".wav"}
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp"}
+
+AUDIO_LABEL = "audio (.m4a/.mp3/.wav)"
 
 
 class InputError(Exception):
@@ -30,7 +32,7 @@ def _find_single(song_dir: Path, exts: set, kind: str) -> Path:
 
 
 def find_audio(song_dir: Path) -> Path:
-    return _find_single(song_dir, AUDIO_EXTS, "audio (.mp3)")
+    return _find_single(song_dir, AUDIO_EXTS, AUDIO_LABEL)
 
 
 def find_image(song_dir: Path) -> Path:

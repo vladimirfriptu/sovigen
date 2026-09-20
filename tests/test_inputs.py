@@ -18,6 +18,12 @@ def test_find_audio_single(tmp_path):
     assert find_audio(tmp_path) == tmp_path / "track.mp3"
 
 
+@pytest.mark.parametrize("name", ["track.m4a", "track.wav", "TRACK.WAV"])
+def test_find_audio_supported_formats(tmp_path, name):
+    _touch(tmp_path / name)
+    assert find_audio(tmp_path) == tmp_path / name
+
+
 def test_find_audio_none(tmp_path):
     with pytest.raises(InputError):
         find_audio(tmp_path)
@@ -25,7 +31,7 @@ def test_find_audio_none(tmp_path):
 
 def test_find_audio_multiple(tmp_path):
     _touch(tmp_path / "a.mp3")
-    _touch(tmp_path / "b.mp3")
+    _touch(tmp_path / "b.wav")
     with pytest.raises(InputError):
         find_audio(tmp_path)
 
