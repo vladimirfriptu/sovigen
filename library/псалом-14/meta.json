@@ -7,7 +7,7 @@
   "source": "psalm-14",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-guitar",
   "variants": [
     {
       "id": "a",
@@ -50,7 +50,7 @@
       "angle": "компания, которая просто пересказывает псалом и вместе ждёт спасения из Сиона"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "h",
   "suno_takes": 0,
   "stage_history": [
     {
