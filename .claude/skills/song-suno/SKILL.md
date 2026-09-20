@@ -45,12 +45,21 @@ Create a todo per variant and work through them in order.
 
 2. **Read each variant's style card** and take its `Style` and `Exclude Styles`
    blocks as that variant's base. Extend them for the variant — do not rewrite
-   them from scratch, the cards are calibrated.
+   them from scratch. The cards were calibrated before v6 and are now starting
+   hypotheses: preserve them until repeated v6 listening evidence justifies a
+   card-level change; record one-off behavior on the song instead.
 
 3. **Fill `variants/<id>/suno.md` for `a`, `b` and `c`.** Keep the template.
    - Frontmatter `style:` — that variant's card stem. The three differ by
      construction; if two match, `song-brief` broke its own rule and the set
      needs fixing before generation.
+   - Frontmatter `model:` and `generation_phase:` — normally `v6` and
+     `precision`. If this is a replacement set after the owner rejected the
+     previous directions, use `v6-wild` and `explore`: its job is to discover a
+     promising rhythm, texture or delivery, not to be accepted blindly as the
+     release master. Add `## Режим генерации` and say what to carry into `v6`
+     for refinement. Use `v6-mini` only when the owner explicitly wants a fast
+     free sketch.
    - `## Style` — one English string. It must positively describe the vocal:
      `clean straight-tone vocal, syllabic delivery (one note per syllable),
      restrained on-the-beat phrasing, no runs, no ad-libs`. Add the BPM and the
@@ -65,7 +74,8 @@ Create a todo per variant and work through them in order.
      whatever this variant's style card excludes.
    - `## Советы по генерации` — what matters for *this* variant: tempo, meter,
      expected length, what to watch for in the vocal, what to do if Suno cuts
-     it (drop one `[Chorus]` repeat, or generate in two passes and splice).
+     it (drop one `[Chorus]` repeat, or generate in two passes and splice), and
+     the model/phase named above.
      Roughly 3 minutes is the safe length. Name the one thing that would make
      this variant a failed take, so the user can stop listening early.
 
@@ -87,6 +97,7 @@ Create a todo per variant and work through them in order.
      knows what he is about to hear;
    - the full lyrics of that variant, verbatim, in a code block — this is what
      goes into Suno's Lyrics field;
+   - its model and generation phase;
    - its `Style` string in its own code block;
    - its `Exclude Styles` string in its own code block;
    - one or two lines of its generation notes.
@@ -99,9 +110,13 @@ Create a todo per variant and work through them in order.
 
 8. **If the user comes back with edits** («второй вариант слишком быстрый», «в
    третьем припев не тот») — edit that variant's `lyrics.md` or `suno.md`
-   yourself, report what changed, and present the affected block again. The
-   stage stays at `prompted`; it only asserts that the files exist. Never tell
-   the user to open or edit a file.
+   yourself, report what changed, and present the affected block again. For an
+   otherwise good v6 take, prefer a plain-language edit of only the bad section
+   or lyric over a full regeneration. If a lyric changes in Suno, make the exact
+   same change in `lyrics.md` first so the repository remains the source of
+   truth. A rejected direction, not a local defect, goes back through
+   `v6-wild`. The stage stays at `prompted`; it only asserts that the files
+   exist. Never tell the user to open or edit a file.
 
 ## Guardrails
 
@@ -110,6 +125,9 @@ Create a todo per variant and work through them in order.
 - One language version in the Lyrics field. Latin transliteration only on
   request, as a separate block.
 - Never write a root `suno.md` — that file belongs to `just choose`.
+- Listen to variants in Suno and download only the chosen take. Download limits
+  apply, and a release intended for YouTube must be downloaded on a paid plan;
+  free trial downloads are personal-use only.
 - Do not run `just choose`, `just import` or `just advance` past `prompted`
   here — the choice is the user's, and `recorded` needs a real `track.mp3`.
 - **Commit and push when the stage is done** — every iteration ends in the

@@ -2,9 +2,17 @@
 song: {slug}
 artifact: suno
 style: 
+model: v6
+generation_phase: precision
 ---
 
 # {title} — генерация в Suno
+
+## Режим генерации
+
+`v6` / `precision` — основной дубль. Если это новый поиск после отвергнутых
+вариантов, заменить на `v6-wild` / `explore` и описать ниже, какую находку затем
+нужно перенести в `v6`.
 
 ## Style
 

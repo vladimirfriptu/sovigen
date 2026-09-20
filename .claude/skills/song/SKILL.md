@@ -96,8 +96,11 @@ is visible. Then work through them.
    there.
 
 5. **At `prompted`, wait for the human.** There is no Suno API. Say, in
-   Russian: «Сгенери все три в Suno и послушай. Как выберешь — скажи какой
-   вариант и откуда скачал файл, дальше я сам.»
+   Russian: «Сгенери все три в указанной модели Suno и послушай. Не скачивай
+   каждый тест: как выберешь — скачай финальный дубль с платного плана и скажи
+   какой вариант и откуда скачал файл, дальше я сам.» Suno now limits downloads,
+   and free trial downloads are personal-use only, so the selected take is the
+   deliberate download boundary.
 
    When the user comes back naming a variant and a take, do these in order:
 

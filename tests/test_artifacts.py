@@ -44,6 +44,13 @@ def test_render_fills_frontmatter(song):
     assert "Мій щит" in text
 
 
+def test_render_suno_defaults_to_v6_precision(song):
+    artifacts.render(song, _data())
+    text = (song / "suno.md").read_text(encoding="utf-8")
+    assert "model: v6\n" in text
+    assert "generation_phase: precision\n" in text
+
+
 def test_render_does_not_overwrite_existing(song):
     (song / "lyrics.md").write_text("мой текст", encoding="utf-8")
     artifacts.render(song, _data())
