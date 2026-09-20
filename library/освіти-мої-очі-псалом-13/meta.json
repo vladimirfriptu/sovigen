@@ -2,54 +2,13 @@
   "meta_version": 3,
   "title": "Освіти мої очі (Псалом 13)",
   "slug": "освіти-мої-очі-псалом-13",
-  "stage": "prompted",
+  "stage": "idea",
   "created": "2026-08-15",
   "source": "psalm-13",
   "series": "psalms",
   "language": "uk",
   "style": null,
-  "variants": [
-    {
-      "id": "a",
-      "style": "ruah",
-      "angle": "тот, кто молится один ночью и считает дни"
-    },
-    {
-      "id": "b",
-      "style": "imagine-dragons",
-      "angle": "тело, которое гаснет: глаза, сон, шатание"
-    },
-    {
-      "id": "c",
-      "style": "bad-omens",
-      "angle": "человек в осаде, слышащий торжество врага"
-    },
-    {
-      "id": "d",
-      "style": "hillsong",
-      "angle": "зал, що питає «доки» вголос; розворот віддано одному голосу"
-    },
-    {
-      "id": "e",
-      "style": "cinematic-orchestral",
-      "angle": "хор тих, хто питав це раніше"
-    },
-    {
-      "id": "f",
-      "style": "epic-hybrid-orchestral",
-      "angle": "тот, кто идёт сквозь ночь и считает шаги"
-    },
-    {
-      "id": "g",
-      "style": "lauren-daigle",
-      "angle": "разговор с Тем, кто в комнате и молчит"
-    },
-    {
-      "id": "h",
-      "style": "newsboys",
-      "angle": "нетерпение утром, вслух и на ходу"
-    }
-  ],
+  "variants": [],
   "chosen_variant": null,
   "suno_takes": 0,
   "stage_history": [
@@ -84,6 +43,10 @@
     {
       "stage": "prompted",
       "at": "2026-08-15"
+    },
+    {
+      "stage": "idea",
+      "at": "2026-09-20"
     }
   ]
 }
