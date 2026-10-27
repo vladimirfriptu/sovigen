@@ -13,7 +13,7 @@ from threading import Lock
 
 from . import commands, meta, paths
 from .artifacts import VIDEO_FILENAME
-from .inputs import AUDIO_EXTS, IMAGE_EXTS
+from .inputs import AUDIO_EXTS, IMAGE_EXTS, InputError, find_audio, find_image
 
 
 MAX_UPLOAD_BYTES = 160 * 1024 * 1024
@@ -34,6 +34,21 @@ def _ready_songs() -> list[dict]:
             continue
         if data.get("stage") == "ready":
             songs.append({"slug": slug, "title": data.get("title", slug)})
+    return songs
+
+
+def _songs_at_stage(stage: str) -> list[dict]:
+    songs = []
+    for slug in paths.list_song_slugs():
+        song_dir = paths.song_dir(slug)
+        if not meta.has_meta(song_dir):
+            continue
+        try:
+            data = meta.read_meta(song_dir)
+        except (OSError, ValueError):
+            continue
+        if data.get("stage") == stage:
+            songs.append({"slug": slug, "dir": song_dir, **data})
     return songs
 
 
@@ -152,9 +167,61 @@ def _render_suno_section() -> str:
     return "".join(html)
 
 
+def _render_upload_section() -> str:
+    cards = []
+    for song in _songs_at_stage("prompted"):
+        slug = str(song["slug"])
+        title = escape(str(song.get("title", slug)))
+        variants = song.get("variants", [])
+        chosen = song.get("chosen_variant")
+        options = []
+        for variant in variants:
+            variant_id = str(variant.get("id", ""))
+            if not variant_id:
+                continue
+            style = str(variant.get("style") or "")
+            marker = " · выбран в проекте" if variant_id == chosen else ""
+            options.append(
+                f'<option value="{escape(variant_id, quote=True)}">'
+                f'{escape(variant_id.upper())} · {escape(style)}{marker}</option>'
+            )
+        cards.append(f"""
+        <article class="stage-card">
+          <div class="stage-title"><h3>{title}</h3><span>ожидает аудио</span></div>
+          <p>Укажи, по какому варианту записан этот файл. Выбор будет сохранён вместе с треком.</p>
+          <form class="upload-step" action="/record-track" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="slug" value="{escape(slug, quote=True)}">
+            <label>Вариант<select name="variant" required><option value="" disabled selected>Выбери вариант записи</option>{''.join(options)}</select></label>
+            <label class="drop">Финальный трек <span>MP3, M4A или WAV · до 160 МБ</span>
+              <input name="audio" type="file" accept=".mp3,.m4a,.wav,audio/*" required></label>
+            <button type="submit">Загрузить трек</button>
+          </form>
+        </article>""")
+
+    for song in _songs_at_stage("recorded"):
+        slug = str(song["slug"])
+        title = escape(str(song.get("title", slug)))
+        cards.append(f"""
+        <article class="stage-card">
+          <div class="stage-title"><h3>{title}</h3><span>трек загружен</span></div>
+          <p>Добавь обложку, чтобы перейти к сборке видео. Перед сборкой проверь, что YouTube-заголовок и описание подготовлены.</p>
+          <form class="upload-step" action="/record-cover" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="slug" value="{escape(slug, quote=True)}">
+            <label class="drop">Обложка <span>JPG, PNG или WebP · до 160 МБ</span>
+              <input name="cover" type="file" accept=".jpg,.jpeg,.png,.webp,image/*" required></label>
+            <button type="submit">Загрузить обложку и перейти к сборке</button>
+          </form>
+        </article>""")
+
+    if not cards:
+        return '<div class="empty">Сейчас нет песен, ожидающих загрузки трека или обложки.</div>'
+    return "".join(cards)
+
+
 def _page(message: str = "", *, download_slug: str | None = None) -> bytes:
     songs = _ready_songs()
     suno_section = _render_suno_section()
+    upload_section = _render_upload_section()
     if songs:
         options = "".join(
             f'<option value="{escape(song["slug"], quote=True)}">'
@@ -165,16 +232,16 @@ def _page(message: str = "", *, download_slug: str | None = None) -> bytes:
         <form action="/build" method="post" enctype="multipart/form-data">
           <label>Песня<select name="slug" required>{options}</select></label>
           <div class="uploads">
-            <label class="drop">Аудио-файл <span>MP3, M4A или WAV</span>
-              <input name="audio" type="file" accept=".mp3,.m4a,.wav,audio/*" required>
+            <label class="drop">Финальный трек <span>MP3, M4A или WAV — если ещё не загружен</span>
+              <input name="audio" type="file" accept=".mp3,.m4a,.wav,audio/*">
             </label>
-            <label class="drop">Обложка <span>JPG, PNG или WebP</span>
-              <input name="cover" type="file" accept=".jpg,.jpeg,.png,.webp,image/*" required>
+            <label class="drop">Обложка <span>JPG, PNG или WebP — если ещё не загружена</span>
+              <input name="cover" type="file" accept=".jpg,.jpeg,.png,.webp,image/*">
             </label>
           </div>
           <label class="check"><input name="viz" type="checkbox" value="1"> Добавить спектр и прогресс-бар</label>
           <button type="submit">Собрать видео</button>
-          <p class="hint">После загрузки файлы попадут в папку песни, а видео будет доступно для скачивания.</p>
+          <p class="hint">Уже загруженные файлы будут использованы автоматически. Видео можно скачать после сборки.</p>
         </form>"""
     else:
         form = '<div class="empty">Сейчас нет песен на стадии <code>ready</code>. Сначала продвиньте нужную песню до этой стадии командой <code>just advance &lt;slug&gt;</code>.</div>'
@@ -195,13 +262,14 @@ def _page(message: str = "", *, download_slug: str | None = None) -> bytes:
 main{{width:min(1000px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:clamp(20px,4vw,44px);box-shadow:0 24px 90px #0008}}
 .eyebrow{{color:var(--gold);letter-spacing:.16em;text-transform:uppercase;font-size:12px;font-weight:700}}h1{{font-size:clamp(30px,6vw,46px);line-height:1.08;margin:12px 0}}.intro,.hint{{color:var(--muted)}}form{{margin-top:32px}}label{{display:block;font-weight:650;margin:18px 0 8px}}select{{display:block;width:100%;margin-top:8px;background:#101114;color:inherit;border:1px solid var(--line);border-radius:12px;padding:14px;font:inherit}}
 .uploads{{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0}}.drop{{min-height:140px;border:1px dashed #68636a;border-radius:16px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;background:#141519}}.drop span{{display:block;color:var(--muted);font-size:13px;font-weight:400}}input[type=file]{{font-size:13px;max-width:100%;margin-top:14px}}.check{{display:flex;gap:10px;align-items:center;font-weight:500}}button,.download{{display:inline-block;border:0;border-radius:12px;background:var(--gold);color:#181511;padding:14px 20px;font:700 16px system-ui;text-decoration:none;cursor:pointer;margin-top:12px}}button:hover,.download:hover{{background:#f2ca83}}.hint{{font-size:13px}}.empty,.notice,.success{{padding:16px;border-radius:14px;margin-top:24px;background:#24262c}}.success{{border:1px solid #526a54;background:#1b2920}}.download{{margin:12px 0 0}}code{{color:var(--gold)}}@media(max-width:560px){{.uploads{{grid-template-columns:1fr}}.drop{{min-height:120px}}}}
-.workspace{{border-top:1px solid var(--line);margin-top:36px;padding-top:26px}}h2{{font-size:22px;margin:0 0 4px}}.section-intro{{color:var(--muted);margin:4px 0 18px}}.song,.variant,.all-fields{{border:1px solid var(--line);border-radius:14px;background:#141519;margin:12px 0;overflow:hidden}}.song>summary,.variant>summary,.all-fields>summary{{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:14px;align-items:center;padding:15px 16px;font-weight:700}}summary::-webkit-details-marker{{display:none}}.song>summary::after,.variant>summary::after,.all-fields>summary::after{{content:'＋';color:var(--gold);font-size:19px}}details[open]>summary::after{{content:'−'}}.song-stage,.angle{{color:var(--muted);font-size:13px;font-weight:400}}.variants{{padding:0 12px 12px}}.variant{{background:#1b1d22;margin:10px 0}}.variant>summary{{font-size:15px}}.chosen{{color:var(--gold);font-size:12px;white-space:nowrap}}.angle{{margin:0;padding:0 16px 12px}}.copy-field{{border-top:1px solid var(--line);padding:14px 16px}}.field-head{{display:flex;justify-content:space-between;gap:10px;align-items:center}}h3{{font-size:14px;margin:0}}button.copy{{margin:0;padding:9px 12px;font-size:13px;white-space:nowrap}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text;background:#111216;color:#eee9df;border:1px solid #292b32;border-radius:10px;padding:13px;margin:10px 0 0;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;max-height:340px;overflow:auto}}.all-fields{{margin:10px 16px;background:#141519}}.all-fields>summary{{font-size:13px;padding:11px 13px;color:var(--muted)}}button.all-copy{{margin:0 16px 16px}}.builder{{padding-bottom:8px}}#toast{{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:.2s;background:#f2ca83;color:#181511;border-radius:12px;padding:12px 18px;font-weight:700;max-width:calc(100vw - 28px);text-align:center;box-shadow:0 8px 32px #0008}}#toast.visible{{opacity:1;transform:translate(-50%,0)}}button:disabled{{opacity:.6;cursor:wait}}@media(max-width:560px){{body{{padding:10px}}main{{border-radius:18px;padding:20px 14px}}.song>summary,.variant>summary{{align-items:flex-start}}.song-stage{{text-align:right;max-width:45%;overflow-wrap:anywhere}}.field-head{{align-items:flex-start}}pre{{font-size:12px;max-height:260px}}}}
+.stage-card{{border:1px solid var(--line);border-radius:16px;background:#141519;padding:18px;margin:12px 0}}.stage-title{{display:flex;justify-content:space-between;gap:12px;align-items:center}}.stage-title h3{{font-size:17px}}.stage-title span{{color:var(--gold);font-size:12px;white-space:nowrap}}.stage-card>p{{color:var(--muted);font-size:14px}}.upload-step{{margin-top:12px}}.upload-step select{{max-width:100%}}.upload-step .drop{{min-height:110px}}.upload-step button{{width:100%}}.notice{{border:1px solid #6e5d35;background:#2b261c}}@media(max-width:560px){{.stage-card{{padding:14px}}.stage-title{{align-items:flex-start;flex-direction:column;gap:2px}}.upload-step button{{min-height:48px}}}}
 </style></head><body><main><div class="eyebrow">Sovigen · локально</div><h1>Студия песни</h1><p class="intro">Тексты и настройки вариантов для Suno — рядом, с копированием каждого поля. Ниже — сборка готового трека в YouTube-видео.</p>
+{notice}<section class="workspace"><h2>Загрузить трек и обложку</h2><p class="section-intro">Загрузки появляются по мере готовности песни.</p>{upload_section}</section>
 <section class="workspace"><h2>Подготовка в Suno</h2><p class="section-intro">Открой вариант, скопируй Lyrics, Style и Exclude Styles по отдельности и вставь в соответствующие поля Suno.</p>{suno_section}</section>
-<section class="workspace builder"><h2>Сборка видео</h2>{notice}{download}{form}</section></main>
+<section class="workspace builder"><h2>Сборка видео</h2>{download}{form}</section></main>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
-document.querySelector('form')?.addEventListener('submit',()=>{{const b=document.querySelector('form button');b.disabled=true;b.textContent='Загружаю и собираю…'}});
+document.querySelectorAll('form').forEach(form=>form.addEventListener('submit',()=>{{const b=form.querySelector('button[type="submit"]');if(b){{b.disabled=true;b.textContent='Загружаю и собираю…'}}}}));
 document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{{
   const target=document.getElementById(button.dataset.copy);if(!target)return;const value=target.textContent.trim();let copied=false;
   try{{if(navigator.clipboard?.writeText){{await navigator.clipboard.writeText(value);copied=true}}}}catch{{}}
@@ -244,6 +312,14 @@ def _read_form(handler: BaseHTTPRequestHandler) -> tuple[dict[str, str], dict[st
             charset = part.get_content_charset() or "utf-8"
             fields[name] = payload.decode(charset, errors="replace")
     return fields, files
+
+
+def _save_upload(slug: str, field: tuple[str, bytes], canonical_name: str) -> Path:
+    suffix = Path(field[0]).suffix.lower()
+    with tempfile.TemporaryDirectory(prefix="sovigen-upload-") as temp_dir:
+        source = Path(temp_dir) / f"{canonical_name}{suffix}"
+        source.write_bytes(field[1])
+        return commands.cmd_import(slug, source)
 
 
 class SovigenHandler(BaseHTTPRequestHandler):
@@ -290,33 +366,66 @@ class SovigenHandler(BaseHTTPRequestHandler):
         self._send_html(_page("Страница не найдена."), 404)
 
     def do_POST(self) -> None:
-        if urlparse(self.path).path != "/build":
+        route = urlparse(self.path).path
+        if route not in {"/record-track", "/record-cover", "/build"}:
             self._send_html(_page("Страница не найдена."), 404)
             return
         try:
             fields, files = _read_form(self)
             with _BUILD_LOCK:
                 slug = fields.get("slug", "")
+                if route == "/record-track":
+                    song = next((s for s in _songs_at_stage("prompted") if s["slug"] == slug), None)
+                    if not song:
+                        raise ValueError("Песня уже прошла этап загрузки трека или не найдена")
+                    variant_id = fields.get("variant", "")
+                    variants = {str(v.get("id")) for v in song.get("variants", [])}
+                    if variant_id not in variants:
+                        raise ValueError("Выбери вариант, по которому записан этот трек")
+                    audio = files.get("audio")
+                    if not audio or Path(audio[0]).suffix.lower() not in AUDIO_EXTS:
+                        raise ValueError("Загрузите MP3, M4A или WAV")
+                    commands.cmd_choose(slug, variant_id)
+                    _save_upload(slug, audio, "track")
+                    commands.cmd_advance(slug)
+                    message = f"Трек загружен для варианта {variant_id.upper()}; песня перешла на этап recorded. Ниже появилась загрузка обложки."
+                    self._send_html(_page(message))
+                    return
+
+                if route == "/record-cover":
+                    song = next((s for s in _songs_at_stage("recorded") if s["slug"] == slug), None)
+                    if not song:
+                        raise ValueError("Песня не ожидает обложку или не найдена")
+                    cover = files.get("cover")
+                    if not cover or Path(cover[0]).suffix.lower() not in IMAGE_EXTS:
+                        raise ValueError("Загрузите JPG, PNG или WebP")
+                    _save_upload(slug, cover, "cover")
+                    commands.cmd_advance(slug)
+                    message = "Обложка загружена; песня готова к сборке. Проверь YouTube-заголовок и описание перед релизом."
+                    self._send_html(_page(message))
+                    return
+
                 if slug not in {song["slug"] for song in _ready_songs()}:
                     raise ValueError("Выберите песню на стадии ready")
                 audio = files.get("audio")
                 cover = files.get("cover")
-                if not audio or Path(audio[0]).suffix.lower() not in AUDIO_EXTS:
+                if audio and Path(audio[0]).suffix.lower() not in AUDIO_EXTS:
                     raise ValueError("Загрузите MP3, M4A или WAV")
-                if not cover or Path(cover[0]).suffix.lower() not in IMAGE_EXTS:
+                if cover and Path(cover[0]).suffix.lower() not in IMAGE_EXTS:
                     raise ValueError("Загрузите JPG, PNG или WebP")
                 song_dir = paths.song_dir(slug)
                 output = song_dir / VIDEO_FILENAME
                 if output.exists():
                     raise ValueError("В папке песни уже есть youtube.mp4. Переместите его перед новой сборкой.")
-                with tempfile.TemporaryDirectory(prefix="sovigen-upload-") as temp_dir:
-                    temp = Path(temp_dir)
-                    audio_path = temp / ("track" + Path(audio[0]).suffix.lower())
-                    cover_path = temp / ("cover" + Path(cover[0]).suffix.lower())
-                    audio_path.write_bytes(audio[1])
-                    cover_path.write_bytes(cover[1])
-                    commands.cmd_import(slug, audio_path)
-                    commands.cmd_import(slug, cover_path)
+                if audio:
+                    _save_upload(slug, audio, "track")
+                if cover:
+                    _save_upload(slug, cover, "cover")
+                try:
+                    find_audio(song_dir)
+                    find_image(song_dir)
+                except InputError as err:
+                    raise ValueError(str(err)) from err
                 commands.cmd_build(slug, viz=fields.get("viz") == "1")
             self._send_html(_page(download_slug=slug))
         except (ValueError, commands.CommandError) as err:
