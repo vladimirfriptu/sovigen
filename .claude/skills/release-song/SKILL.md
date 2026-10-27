@@ -52,14 +52,13 @@ Create a todo per step and work through them in order.
      ask the user before overwriting (the build refuses silently otherwise).
 
 4. **Build.**
-   - If stage is `recorded`, run `just advance <slug>` first — it checks the
-     cover and `youtube.md` are there and moves the song to `ready`. (`build`
-     itself doesn't require `ready`; only `build-all` filters on it. The old
-     `ready` command no longer exists.)
-   - Run `just build <slug>`.
-   - This runs real ffmpeg and, on success, sets stage to `pre-published`.
-   - If ffmpeg fails, surface stderr and stop — stage stays unchanged.
-     Treat it as a real bug (use systematic-debugging), don't paper over it.
+   - Run `just release-static <slug>` for a song at `recorded` or `ready`.
+     The script advances `recorded` to `ready` when required, builds a
+     static-cover MP4, and advances to `pre-published`.
+   - The script verifies 1920×1080 `yuv420p` output and checks that its
+     duration matches the audio.
+   - If ffmpeg or verification fails, surface the error and stop. Treat it as a
+     real bug (use systematic-debugging), don't paper over it.
 
 5. **Verify the output (evidence before claiming success).**
    - `ffprobe -v error -select_streams v:0 -show_entries stream=width,height,pix_fmt -of default=noprint_wrappers=1 library/<slug>/youtube.mp4`

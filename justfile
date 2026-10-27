@@ -25,9 +25,13 @@ choose slug variant:
 import slug path:
     {{python}} -m sovigen.cli import "{{slug}}" "{{path}}"
 
-# build one song by slug: just build my-track-name [--viz]
+# build one song by slug: just build my-track-name [--static|--viz]
 build slug *args:
     {{python}} -m sovigen.cli build "{{slug}}" {{args}}
+
+# move a recorded/ready song through static video build to pre-published
+release-static slug:
+    bash scripts/release-static.sh "{{slug}}"
 
 # build every song at stage 'ready'
 build-all:
@@ -36,6 +40,10 @@ build-all:
 # start the localhost upload-and-build interface
 web:
     {{python}} -m sovigen.web
+
+# start the phone-friendly studio on the local network
+web-lan:
+    bash scripts/start-studio.sh
 
 # mark a song published: just publish my-track-name
 publish slug:

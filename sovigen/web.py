@@ -311,9 +311,8 @@ def _page(message: str = "", *, download_slug: str | None = None) -> bytes:
               <input name="cover" type="file" accept=".jpg,.jpeg,.png,.webp,image/*">
             </label>
           </div>
-          <label class="check"><input name="viz" type="checkbox" value="1"> Добавить спектр и прогресс-бар</label>
           <button type="submit">Собрать видео</button>
-          <p class="hint">Уже загруженные файлы будут использованы автоматически. Видео можно скачать после сборки.</p>
+          <p class="hint">Собирается видео со статичной обложкой. Уже загруженные файлы используются автоматически.</p>
         </form>"""
     else:
         form = '<div class="empty">Сейчас нет песен на стадии <code>ready</code>. Сначала продвиньте нужную песню до этой стадии командой <code>just advance &lt;slug&gt;</code>.</div>'
@@ -504,7 +503,7 @@ class SovigenHandler(BaseHTTPRequestHandler):
                     find_image(song_dir)
                 except InputError as err:
                     raise ValueError(str(err)) from err
-                commands.cmd_build(slug, viz=fields.get("viz") == "1")
+                commands.cmd_build(slug, static=True)
             self._send_html(_page(download_slug=slug))
         except (ValueError, commands.CommandError) as err:
             self._send_html(_page(str(err)), 400)

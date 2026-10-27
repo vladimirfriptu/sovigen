@@ -60,7 +60,7 @@ def cmd_new(title: str, *, source=None, series=None, language: str = "uk") -> Pa
     return sdir
 
 
-def cmd_build(slug: str, viz: bool = False) -> Path:
+def cmd_build(slug: str, viz: bool = False, static: bool = False) -> Path:
     sdir = _require_song(slug)
     data = _read_meta_or_fail(slug, sdir)
     stage = data.get("stage", "?")
@@ -74,7 +74,9 @@ def cmd_build(slug: str, viz: bool = False) -> Path:
         raise CommandError(f"{VIDEO_FILENAME} already exists for {slug}")
     image = find_image(sdir)
     audio = find_audio(sdir)
-    style = VIDEO_STYLE_SPECTRUM if viz else data.get("video_style", VIDEO_STYLE_STATIC)
+    if viz and static:
+        raise CommandError("choose either --viz or --static")
+    style = VIDEO_STYLE_SPECTRUM if viz else VIDEO_STYLE_STATIC
     duration = _probe_duration(slug, audio)
     if style == VIDEO_STYLE_SPECTRUM:
         cmd = build_spectrum_video_cmd(image, audio, output, duration)
