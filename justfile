@@ -33,6 +33,10 @@ build slug *args:
 build-all:
     {{python}} -m sovigen.cli build-all
 
+# start the localhost upload-and-build interface
+web:
+    {{python}} -m sovigen.web
+
 # mark a song published: just publish my-track-name
 publish slug:
     {{python}} -m sovigen.cli publish "{{slug}}"

@@ -132,6 +132,7 @@ just build my-track-name           # собирает youtube.mp4, stage → pre
 just build my-track-name --viz     # то же, но с линией спектра и прогресс-баром;
                                    # выбор запоминается в meta.json (video_style)
 just build-all                     # собирает все песни со stage=ready
+just web                           # локальная страница загрузки и сборки видео
 
 # залей youtube.mp4 на YouTube, затем:
 just publish my-track-name         # stage → published
@@ -160,6 +161,26 @@ python3 -m sovigen.cli publish my-track-name
 python3 -m sovigen.cli suno my-track-name [variant] [--pause 30]
 python3 -m sovigen.cli status [--json]
 ```
+
+## Локальная загрузка и сборка видео
+
+Когда песня дошла до стадии `ready`, запусти локальную страницу:
+
+```bash
+just web
+# открой http://127.0.0.1:8765
+```
+
+Выбери песню, загрузи MP3/M4A/WAV и JPG/PNG/WebP. Файлы попадут в папку
+песни через обычную команду `import`, затем запустится `build`; готовый
+`youtube.mp4` можно скачать по ссылке на странице. Необязательный флажок
+включает спектр и прогресс-бар. Максимальный размер загрузки — 160 МБ.
+Сервер слушает только localhost. Для доступа с другого компьютера используй
+SSH-туннель к порту 8765; не публикуй этот сервер напрямую в интернет.
+
+Видео и загруженные медиа остаются локальными и по-прежнему исключены из Git.
+Страница показывает только песни на стадии `ready`; сборка переводит песню в
+`pre-published`, как и CLI.
 
 ## Структура кода
 
