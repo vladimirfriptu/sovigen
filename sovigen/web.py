@@ -5,7 +5,7 @@ from email.parser import BytesParser
 from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import quote, unquote, urlparse
 import os
 import re
 import tempfile
@@ -67,6 +67,13 @@ def _prompted_songs() -> list[dict]:
     return songs
 
 
+def _published_videos() -> list[dict]:
+    return [
+        song for song in _songs_at_stage("pre-published")
+        if (song["dir"] / VIDEO_FILENAME).is_file()
+    ]
+
+
 def _without_frontmatter(document: str) -> str:
     if document.startswith("---\n"):
         _, _, body = document.split("---", 2)
@@ -86,6 +93,22 @@ def _section(document: str, heading: str) -> str:
 def _code_value(section: str) -> str:
     match = re.search(r"```[^\n]*\n(.*?)\n```", section, flags=re.DOTALL)
     return match.group(1).strip() if match else ""
+
+
+def _youtube_fields(song_dir: Path) -> dict[str, str | bool]:
+    path = song_dir / "youtube.md"
+    document = _without_frontmatter(path.read_text(encoding="utf-8")) if path.is_file() else ""
+    tags_section = _section(document, "Теги")
+    tags = "\n".join(
+        line.strip() for line in tags_section.splitlines()
+        if line.strip() and not line.lstrip().startswith(">")
+    ).strip()
+    return {
+        "title": _section(document, "Заголовок"),
+        "description": _section(document, "Описание"),
+        "tags": tags,
+        "tags_draft": "чернов" in tags_section.lower() or "предлож" in tags_section.lower(),
+    }
 
 
 def _lyrics_value(path: Path) -> str:
@@ -222,10 +245,55 @@ def _render_upload_section() -> str:
     return "".join(cards)
 
 
+def _render_youtube_section() -> str:
+    songs = _published_videos()
+    if not songs:
+        return '<div class="empty">Готовых видео для YouTube пока нет.</div>'
+
+    cards = []
+    for index, song in enumerate(songs, 1):
+        slug = str(song["slug"])
+        title = str(song.get("title", slug))
+        fields = _youtube_fields(song["dir"])
+        output = song["dir"] / VIDEO_FILENAME
+        size_mb = output.stat().st_size / (1024 * 1024)
+        download_url = f"/download/{quote(slug, safe='')}"
+        field_specs = (
+            ("title", "1", "Заголовок"),
+            ("description", "2", "Описание"),
+            ("tags", "3", "Теги"),
+        )
+        copy_fields = []
+        for name, step, label in field_specs:
+            value = fields[name]
+            if not value:
+                continue
+            copy_id = f"youtube-{name}-{index}"
+            copy_fields.append(f"""
+            <section class="copy-field youtube-field">
+              <div class="field-head"><h3>Шаг {step} · {label}</h3>
+                <button class="copy" data-copy="{copy_id}">Копировать {label.lower()}</button></div>
+              <pre id="{copy_id}">{escape(value)}</pre>
+            </section>""")
+        tags_hint = (
+            '<p class="hint draft-hint">Список тегов — черновое предложение; перед публикацией проверь его.</p>'
+            if fields["tags_draft"] else ""
+        )
+        cards.append(f"""
+        <article class="stage-card publish-card">
+          <div class="stage-title"><h3>{escape(title)}</h3><span>готово к загрузке</span></div>
+          <a class="download youtube-download" href="{download_url}">Скачать видео · {size_mb:.1f} МБ</a>
+          <p class="section-intro youtube-intro">Скопируй поля по порядку и вставь в соответствующие поля YouTube.</p>
+          {''.join(copy_fields)}{tags_hint}
+        </article>""")
+    return "".join(cards)
+
+
 def _page(message: str = "", *, download_slug: str | None = None) -> bytes:
     songs = _ready_songs()
     suno_section = _render_suno_section()
     upload_section = _render_upload_section()
+    youtube_section = _render_youtube_section()
     if songs:
         options = "".join(
             f'<option value="{escape(song["slug"], quote=True)}">'
@@ -270,9 +338,11 @@ main{{width:min(1000px,100%);background:var(--panel);border:1px solid var(--line
 .workspace{{margin-top:28px;padding-top:24px;border-top:1px solid var(--line);min-width:0}}.workspace h2{{font-size:21px;line-height:1.25;margin:0 0 8px}}.section-intro{{margin:0 0 16px;color:var(--muted);font-size:14px}}
 .song,.variant,.all-fields{{border:1px solid var(--line);border-radius:14px;background:#141519;min-width:0}}.song{{margin:12px 0;overflow:hidden}}.song>summary,.variant>summary,.all-fields>summary{{cursor:pointer;list-style:none;padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;font-weight:650}}summary::-webkit-details-marker{{display:none}}.song>summary:after,.variant>summary:after{{content:'＋';color:var(--gold);flex:0 0 auto}}details[open]>summary:after{{content:'−'}}.song-stage{{color:var(--muted);font-size:12px;font-weight:400;text-align:right;overflow-wrap:anywhere}}.variants{{padding:0 12px 12px}}.variant{{margin-top:10px;background:#191b20}}.variant>summary{{padding:12px}}.chosen{{color:var(--gold);font-size:12px;flex:0 0 auto}}.angle{{padding:0 12px;color:var(--muted);font-size:14px}}
 .copy-field{{margin:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}}.field-head{{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;background:#202228}}.field-head h3{{font-size:14px;margin:0}}button.copy{{margin:0;padding:8px 11px;font-size:13px;white-space:nowrap}}pre{{margin:0;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:14px/1.55 ui-monospace,monospace;max-height:420px;overflow:auto;background:#101114}}.all-fields{{margin:12px;padding:0}}.all-fields>summary{{font-size:13px;padding:10px 12px}}.all-copy{{margin:0 12px 12px!important}}#toast{{position:fixed;z-index:30;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#e8b96a;color:#181511;padding:10px 16px;border-radius:12px;font-weight:650;transition:.18s;max-width:calc(100vw - 24px);text-align:center}}#toast.visible{{opacity:1;transform:translate(-50%,0)}}button:disabled{{opacity:.65;cursor:wait}}
+.publish-card{{margin-top:16px}}.youtube-download{{margin:8px 12px 4px}}.youtube-intro{{margin:12px 12px 4px}}.youtube-field{{margin-top:10px;margin-bottom:10px}}.draft-hint{{margin:0 12px 12px}}
 @media(max-width:560px){{body{{padding:10px}}main{{border-radius:16px;padding:18px 14px}}.workspace{{margin-top:22px;padding-top:18px}}.workspace h2{{font-size:19px}}.song>summary{{flex-wrap:wrap}}.song-stage{{text-align:left}}.variants{{padding:0 8px 8px}}.variant>summary{{padding:11px 10px}}.copy-field{{margin:10px 8px}}.field-head{{align-items:flex-start;flex-wrap:wrap}}.field-head button{{min-height:40px}}.all-fields,.all-copy{{margin-left:8px!important;margin-right:8px!important}}pre{{font-size:13px;max-height:360px}}}}
 </style></head><body><main><div class="eyebrow">Sovigen · локально</div><h1>Студия песни</h1><p class="intro">Тексты и настройки вариантов для Suno — рядом, с копированием каждого поля. Ниже — сборка готового трека в YouTube-видео.</p>
 {notice}<section class="workspace"><h2>Загрузить трек и обложку</h2><p class="section-intro">Загрузки появляются по мере готовности песни.</p>{upload_section}</section>
+<section class="workspace" id="youtube-publish"><h2>Подготовка к YouTube</h2><p class="section-intro">Сначала скачай видео, затем скопируй заголовок, описание и теги по шагам.</p>{youtube_section}</section>
 <section class="workspace"><h2>Подготовка в Suno</h2><p class="section-intro">Открой вариант, скопируй Lyrics, Style и Exclude Styles по отдельности и вставь в соответствующие поля Suno.</p>{suno_section}</section>
 <section class="workspace builder"><h2>Сборка видео</h2>{download}{form}</section></main>
 <div id="toast" role="status" aria-live="polite"></div>
