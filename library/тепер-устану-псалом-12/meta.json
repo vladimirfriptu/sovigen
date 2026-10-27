@@ -7,7 +7,7 @@
   "source": "psalm-12",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-guitar",
   "variants": [
     {
       "id": "a",
@@ -40,7 +40,7 @@
       "angle": "друзья в дороге, держащиеся Божьих слов"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "f",
   "suno_takes": 0,
   "stage_history": [
     {
