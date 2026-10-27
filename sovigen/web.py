@@ -180,18 +180,22 @@ def _render_upload_section() -> str:
             if not variant_id:
                 continue
             style = str(variant.get("style") or "")
+            selected = " selected" if variant_id == chosen else ""
             marker = " · выбран в проекте" if variant_id == chosen else ""
             options.append(
-                f'<option value="{escape(variant_id, quote=True)}">'
+                f'<option value="{escape(variant_id, quote=True)}"{selected}>'
                 f'{escape(variant_id.upper())} · {escape(style)}{marker}</option>'
             )
+        placeholder = (
+            "" if chosen else '<option value="" disabled selected>Выбери вариант записи</option>'
+        )
         cards.append(f"""
         <article class="stage-card">
           <div class="stage-title"><h3>{title}</h3><span>ожидает аудио</span></div>
           <p>Укажи, по какому варианту записан этот файл. Выбор будет сохранён вместе с треком.</p>
           <form class="upload-step" action="/record-track" method="post" enctype="multipart/form-data">
             <input type="hidden" name="slug" value="{escape(slug, quote=True)}">
-            <label>Вариант<select name="variant" required><option value="" disabled selected>Выбери вариант записи</option>{''.join(options)}</select></label>
+            <label>Вариант<select name="variant" required>{placeholder}{''.join(options)}</select></label>
             <label class="drop">Финальный трек <span>MP3, M4A или WAV · до 160 МБ</span>
               <input name="audio" type="file" accept=".mp3,.m4a,.wav,audio/*" required></label>
             <button type="submit">Загрузить трек</button>
