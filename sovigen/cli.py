@@ -105,7 +105,13 @@ def _dispatch(args) -> int:
 
 def _run_suno(args) -> int:
     variants = [args.variant] if args.variant else suno.list_variants(args.slug)
-    bridge = suno_bridge.Bridge()
+    try:
+        bridge = suno_bridge.Bridge()
+    except OSError as err:
+        raise suno.SunoError(
+            f"bridge port is busy ({err}): the web studio may hold it; "
+            "send from the studio button or stop the studio"
+        ) from err
     bridge.start()
     try:
         results = suno.send_to_suno(args.slug, variants, args.pause, bridge)

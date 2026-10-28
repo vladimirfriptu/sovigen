@@ -78,3 +78,17 @@ def test_unknown_path_is_404(bridge):
     with pytest.raises(urllib.error.HTTPError) as err:
         _get(bridge, "/other")
     assert err.value.code == 404
+
+
+def test_extension_offline_before_any_poll(bridge):
+    assert bridge.extension_online(max_age=10) is False
+
+
+def test_extension_online_right_after_a_poll(bridge):
+    _get(bridge)
+    assert bridge.extension_online(max_age=10) is True
+
+
+def test_extension_goes_offline_when_polls_stop(bridge):
+    _get(bridge)
+    assert bridge.extension_online(max_age=0) is False

@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -13,6 +14,7 @@ class Bridge:
         self._events = {}
         self._lock = threading.Lock()
         self._extension_seen = threading.Event()
+        self._last_poll = None
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._make_handler())
         self.port = self._server.server_address[1]
         self._thread = None
@@ -41,8 +43,13 @@ class Bridge:
     def wait_for_extension(self, timeout: float) -> bool:
         return self._extension_seen.wait(timeout)
 
+    def extension_online(self, max_age: float) -> bool:
+        last = self._last_poll
+        return last is not None and time.monotonic() - last <= max_age
+
     def _next_job(self):
         self._extension_seen.set()
+        self._last_poll = time.monotonic()
         with self._lock:
             if not self._queue:
                 return None

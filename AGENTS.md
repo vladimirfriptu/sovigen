@@ -51,7 +51,8 @@ workflow files when they differ.
 - Two working modes share the same stages and files (README, "Два режима
   работы"). On the owner's Mac, variants go to Suno with `just suno`. On
   fhome-ai (agent-pi) or from the phone there is no Chrome: use the web studio
-  (`just web-lan`) and its Suno copy block. If `just suno` reports that the
+  (`just web-lan`) and its Suno copy block; the studio shows a "send to Suno"
+  button only while the extension is connected, so there it stays hidden. If `just suno` reports that the
   extension did not connect, you are in the second mode; do not retry it.
 - Media are intentionally ignored by Git. Never bypass `.gitignore` to commit
   audio, cover images, raw takes, or rendered video.

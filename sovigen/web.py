@@ -1,5 +1,6 @@
 """Small localhost upload-and-build interface for Sovigen."""
 
+import json
 from email import policy
 from email.parser import BytesParser
 from html import escape
@@ -11,7 +12,8 @@ import re
 import tempfile
 from threading import Lock
 
-from . import commands, meta, paths
+from . import commands, meta, paths, suno
+from .suno_bridge import Bridge
 from .artifacts import VIDEO_FILENAME
 from .inputs import AUDIO_EXTS, IMAGE_EXTS, InputError, find_audio, find_image
 
@@ -20,6 +22,24 @@ MAX_UPLOAD_BYTES = 160 * 1024 * 1024
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 _BUILD_LOCK = Lock()
+_SUNO_LOCK = Lock()
+SUNO_ONLINE_SECONDS = 10
+_bridge = None
+
+
+def _suno_available() -> bool:
+    return _bridge is not None and _bridge.extension_online(SUNO_ONLINE_SECONDS)
+
+
+def _start_bridge() -> None:
+    global _bridge
+    try:
+        bridge = Bridge(int(os.environ.get("SOVIGEN_SUNO_PORT", 8787)))
+        bridge.start()
+    except OSError:
+        # Port taken, for example by a running `just suno`: the button stays hidden.
+        return
+    _bridge = bridge
 
 
 def _ready_songs() -> list[dict]:
@@ -162,6 +182,7 @@ def _render_suno_section() -> str:
               <summary><span>Вариант {escape(variant_id.upper())} · {escape(style_label)}</span>
                 <span class="chosen">{'Выбран' if selected else ''}</span></summary>
               <p class="angle">{escape(angle)}</p>
+              <div class="send-row"><button class="send-suno" data-slug="{escape(slug, quote=True)}" data-variant="{escape(variant_id, quote=True)}" hidden>Отправить в Suno</button></div>
               <section class="copy-field">
                 <div class="field-head"><h3>Lyrics · текст песни</h3><button class="copy" data-copy="lyrics-{suffix}">Копировать текст</button></div>
                 <pre id="lyrics-{suffix}">{escape(lyric_text)}</pre>
@@ -339,6 +360,7 @@ main{{width:min(1000px,100%);background:var(--panel);border:1px solid var(--line
 .copy-field{{margin:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}}.field-head{{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;background:#202228}}.field-head h3{{font-size:14px;margin:0}}button.copy{{margin:0;padding:8px 11px;font-size:13px;white-space:nowrap}}pre{{margin:0;padding:12px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font:14px/1.55 ui-monospace,monospace;max-height:420px;overflow:auto;background:#101114}}.all-fields{{margin:12px;padding:0}}.all-fields>summary{{font-size:13px;padding:10px 12px}}.all-copy{{margin:0 12px 12px!important}}#toast{{position:fixed;z-index:30;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#e8b96a;color:#181511;padding:10px 16px;border-radius:12px;font-weight:650;transition:.18s;max-width:calc(100vw - 24px);text-align:center}}#toast.visible{{opacity:1;transform:translate(-50%,0)}}button:disabled{{opacity:.65;cursor:wait}}
 .publish-card{{margin-top:16px}}.youtube-download{{margin:8px 12px 4px}}.youtube-intro{{margin:12px 12px 4px}}.youtube-field{{margin-top:10px;margin-bottom:10px}}.draft-hint{{margin:0 12px 12px}}
 @media(max-width:560px){{body{{padding:10px}}main{{border-radius:16px;padding:18px 14px}}.workspace{{margin-top:22px;padding-top:18px}}.workspace h2{{font-size:19px}}.song>summary{{flex-wrap:wrap}}.song-stage{{text-align:left}}.variants{{padding:0 8px 8px}}.variant>summary{{padding:11px 10px}}.copy-field{{margin:10px 8px}}.field-head{{align-items:flex-start;flex-wrap:wrap}}.field-head button{{min-height:40px}}.all-fields,.all-copy{{margin-left:8px!important;margin-right:8px!important}}pre{{font-size:13px;max-height:360px}}}}
+.send-row{{margin:0 12px}}.send-suno[hidden]{{display:none}}.send-suno{{margin:4px 0 8px}}
 </style></head><body><main><div class="eyebrow">Sovigen · локально</div><h1>Студия песни</h1><p class="intro">Тексты и настройки вариантов для Suno — рядом, с копированием каждого поля. Ниже — сборка готового трека в YouTube-видео.</p>
 {notice}<section class="workspace"><h2>Загрузить трек и обложку</h2><p class="section-intro">Загрузки появляются по мере готовности песни.</p>{upload_section}</section>
 <section class="workspace" id="youtube-publish"><h2>Подготовка к YouTube</h2><p class="section-intro">Сначала скачай видео, затем скопируй заголовок, описание и теги по шагам.</p>{youtube_section}</section>
@@ -354,6 +376,23 @@ document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener
   if(!copied){{const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.setAttribute('aria-label','Текст для ручного копирования');field.style.cssText='position:fixed;z-index:20;left:12px;right:12px;bottom:72px;width:calc(100% - 24px);height:150px;background:#191b20;color:#fff;border:2px solid #e8b96a;border-radius:12px;padding:12px;font:13px/1.45 monospace;opacity:1';document.body.appendChild(field);field.focus();field.select();try{{copied=document.execCommand('copy')}}catch{{}}if(copied)field.remove();else{{toast.textContent='Выдели текст в появившемся окне и скопируй';toast.classList.add('visible');setTimeout(()=>{{toast.classList.remove('visible');field.remove()}},12000);return}}}}
   toast.textContent=copied?'Скопировано':'Скопировать не удалось';toast.classList.add('visible');setTimeout(()=>toast.classList.remove('visible'),2600)
 }}));
+const sendButtons=document.querySelectorAll('.send-suno');
+if(sendButtons.length){{
+  const refresh=()=>fetch('/api/suno/status').then(r=>r.json()).then(s=>sendButtons.forEach(b=>{{if(!b.dataset.busy)b.hidden=!s.available}})).catch(()=>sendButtons.forEach(b=>{{b.hidden=true}}));
+  refresh();setInterval(refresh,5000);
+  sendButtons.forEach(button=>button.addEventListener('click',async()=>{{
+    const toast=document.getElementById('toast');const label=button.textContent;
+    button.disabled=true;button.dataset.busy='1';button.textContent='Отправляю в Suno…';
+    let text='Не удалось отправить';
+    try{{
+      const response=await fetch('/api/suno/send',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify({{slug:button.dataset.slug,variant:button.dataset.variant}})}});
+      const result=await response.json();
+      text=result.ok?`Suno запущен: ${{result.clips}} клипа`:`Ошибка: ${{result.error}}`;
+    }}catch{{}}
+    button.disabled=false;delete button.dataset.busy;button.textContent=label;
+    toast.textContent=text;toast.classList.add('visible');setTimeout(()=>toast.classList.remove('visible'),6000);
+  }}));
+}}
 </script></body></html>"""
     return document.encode("utf-8")
 
@@ -415,8 +454,51 @@ class SovigenHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_json(self, payload: dict, status: int = 200) -> None:
+        body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _suno_send(self) -> None:
+        origin = self.headers.get("Origin")
+        if origin and urlparse(origin).netloc != self.headers.get("Host"):
+            self._send_json({"ok": False, "error": "foreign origin"}, 403)
+            return
+        if self.headers.get("Content-Type", "").split(";")[0].strip() != "application/json":
+            self._send_json({"ok": False, "error": "JSON expected"}, 415)
+            return
+        try:
+            length = int(self.headers.get("Content-Length", 0))
+            payload = json.loads(self.rfile.read(length) or b"{}")
+            slug = str(payload["slug"])
+            variant = str(payload["variant"])
+        except (ValueError, KeyError, TypeError):
+            self._send_json({"ok": False, "error": "slug and variant are required"}, 400)
+            return
+        if not _suno_available():
+            self._send_json({"ok": False, "error": "расширение Suno не на связи"}, 409)
+            return
+        if not _SUNO_LOCK.acquire(blocking=False):
+            self._send_json({"ok": False, "error": "другая отправка ещё идёт"}, 409)
+            return
+        try:
+            rows = suno.send_to_suno(slug, [variant], 0, _bridge)
+        except suno.SunoError as err:
+            self._send_json({"ok": False, "error": str(err)}, 400)
+            return
+        finally:
+            _SUNO_LOCK.release()
+        self._send_json(rows[0])
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/api/suno/status":
+            self._send_json({"available": _suno_available()})
+            return
         if parsed.path == "/":
             self._send_html(_page())
             return
@@ -444,6 +526,9 @@ class SovigenHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         route = urlparse(self.path).path
+        if route == "/api/suno/send":
+            self._suno_send()
+            return
         if route not in {"/record-track", "/record-cover", "/build"}:
             self._send_html(_page("Страница не найдена."), 404)
             return
@@ -512,6 +597,7 @@ class SovigenHandler(BaseHTTPRequestHandler):
 
 
 def serve(host: str = DEFAULT_HOST, port: int = DEFAULT_PORT) -> None:
+    _start_bridge()
     server = ThreadingHTTPServer((host, port), SovigenHandler)
     print(f"Sovigen local builder: http://{host}:{port}")
     try:
