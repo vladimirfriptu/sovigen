@@ -45,9 +45,13 @@ web:
 web-lan:
     bash scripts/start-studio.sh
 
-# mark a song published: just publish my-track-name
-publish slug:
-    {{python}} -m sovigen.cli publish "{{slug}}"
+# mark a song published, optionally with its YouTube link: just publish my-track-name [url]
+publish slug *args:
+    {{python}} -m sovigen.cli publish "{{slug}}" {{args}}
+
+# attach or change the YouTube link of a song: just youtube my-track-name https://youtu.be/...
+youtube slug url:
+    {{python}} -m sovigen.cli youtube "{{slug}}" "{{url}}"
 
 # show all songs and their stages: just status [--json]
 status *args:

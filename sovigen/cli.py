@@ -35,6 +35,11 @@ def main(argv=None) -> int:
 
     p_pub = sub.add_parser("publish")
     p_pub.add_argument("slug")
+    p_pub.add_argument("url", nargs="?", default=None)
+
+    p_yt = sub.add_parser("youtube")
+    p_yt.add_argument("slug")
+    p_yt.add_argument("url")
 
     p_suno = sub.add_parser("suno")
     p_suno.add_argument("slug")
@@ -88,8 +93,12 @@ def _dispatch(args) -> int:
         print(f"imported {dest}")
         return 0
     if args.command == "publish":
-        commands.cmd_publish(args.slug)
+        commands.cmd_publish(args.slug, args.url)
         print(f"published {args.slug}")
+        return 0
+    if args.command == "youtube":
+        link = commands.cmd_set_youtube(args.slug, args.url)
+        print(f"{args.slug}: {link}")
         return 0
     if args.command == "suno":
         return _run_suno(args)

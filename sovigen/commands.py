@@ -6,7 +6,7 @@ from pathlib import Path
 
 from . import artifacts
 from . import meta as meta_mod
-from . import paths
+from . import paths, youtube
 from .artifacts import AUDIO_FILENAME, VIDEO_FILENAME
 from .ffmpegcmd import (
     build_spectrum_video_cmd,
@@ -189,8 +189,26 @@ def _variant_style(data: dict, variant_id: str):
     return None
 
 
-def cmd_publish(slug: str) -> None:
+def _canonical_youtube_url(url: str) -> str:
+    try:
+        return youtube.canonical(url)
+    except ValueError as err:
+        raise CommandError(str(err)) from err
+
+
+def cmd_set_youtube(slug: str, url: str) -> str:
     sdir = _require_song(slug)
+    canonical = _canonical_youtube_url(url)
+    data = _read_meta_or_fail(slug, sdir)
+    data["youtube_url"] = canonical
+    meta_mod.write_meta(sdir, data)
+    return canonical
+
+
+def cmd_publish(slug: str, url=None) -> None:
+    sdir = _require_song(slug)
+    if url:
+        cmd_set_youtube(slug, url)
     today = datetime.date.today().isoformat()
     meta_mod.set_stage(sdir, "published", today)
 

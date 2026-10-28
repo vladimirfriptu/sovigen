@@ -261,6 +261,31 @@ def test_advance_records_history(lib):
     assert history[-1]["stage"] == "brief"
 
 
+def test_publish_with_a_link_stores_the_canonical_url(lib):
+    _make_song(lib, "song-yt", stage="pre-published")
+    commands.cmd_publish("song-yt", "https://youtu.be/dQw4w9WgXcQ?si=x")
+    data = meta.read_meta(lib / "song-yt")
+    assert data["stage"] == "published"
+    assert data["youtube_url"] == "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+
+def test_publish_with_a_bad_link_changes_nothing(lib):
+    _make_song(lib, "song-bad", stage="pre-published")
+    with pytest.raises(commands.CommandError):
+        commands.cmd_publish("song-bad", "https://example.com/x")
+    data = meta.read_meta(lib / "song-bad")
+    assert data["stage"] == "pre-published"
+    assert "youtube_url" not in data
+
+
+def test_set_youtube_keeps_the_stage(lib):
+    _make_song(lib, "song-old", stage="published", with_inputs=False)
+    commands.cmd_set_youtube("song-old", "https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+    data = meta.read_meta(lib / "song-old")
+    assert data["stage"] == "published"
+    assert data["youtube_url"].endswith("dQw4w9WgXcQ")
+
+
 def test_publish_sets_stage(lib):
     _make_song(lib, "song-d", stage="pre-published")
     commands.cmd_publish("song-d")
