@@ -41,8 +41,13 @@ workflow files when they differ.
 - The private `BRAIN` path mentioned in `.claude/CLAUDE.md` and the two brain
   commands exists only on the owner's machine. If it is absent, follow the
   documented rule: report that it is unavailable and do not create a fallback.
-- Suno generation/listening and YouTube upload remain human actions. Never
-  claim they were performed without access and evidence.
+- Suno listening, choosing and downloading, and YouTube upload, remain human
+  actions. Never claim they were performed without access and evidence.
+- `just suno <slug> [variant]` sends variants to Suno through the owner's Chrome
+  extension (`extension/`, README section "Отправка вариантов в Suno"). It spends
+  Suno credits and needs the owner's open Chrome tab, so run it only when the
+  owner asks. Report its output as it is: `started (N clips)` or the error.
+  Never edit `DRY_RUN` in `extension/content.js` without being asked.
 - Media are intentionally ignored by Git. Never bypass `.gitignore` to commit
   audio, cover images, raw takes, or rendered video.
 

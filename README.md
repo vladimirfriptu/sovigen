@@ -136,6 +136,8 @@ just build-all                     # собирает все песни со sta
 # залей youtube.mp4 на YouTube, затем:
 just publish my-track-name         # stage → published
 
+just suno my-track-name [a]        # отправляет варианты в Suno через расширение Chrome (см. ниже)
+
 just status                        # таблица всех песен, их стадий и чьего хода ждём
 just status --json                 # то же самое в JSON
 ```
@@ -155,6 +157,7 @@ python3 -m sovigen.cli import my-track-name ~/Downloads/take.wav
 python3 -m sovigen.cli build my-track-name
 python3 -m sovigen.cli build-all
 python3 -m sovigen.cli publish my-track-name
+python3 -m sovigen.cli suno my-track-name [variant] [--pause 30]
 python3 -m sovigen.cli status [--json]
 ```
 
@@ -170,6 +173,9 @@ sovigen/
   inputs.py         # поиск ровно одного аудио и одной картинки в папке
   meta.py           # чтение/запись meta.json, восемь стадий, переходы
   paths.py          # расположение library/ и папок песен
+  suno.py           # разбор variants/<id>/{suno,lyrics}.md и отправка вариантов в Suno
+  suno_bridge.py    # локальный сервер 127.0.0.1:8765, отдаёт задачи расширению
+extension/          # расширение Chrome (Manifest V3, чистый JS), заполняет форму Suno
   slug.py           # slugify заголовка (Unicode-aware, сохраняет кириллицу)
 library/
   <slug>/           # одна папка на песню, см. выше
