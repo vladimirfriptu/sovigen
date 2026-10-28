@@ -37,6 +37,12 @@ function findStyleTextarea() {
   });
 }
 
+// The create page holds more than one title input, so only the visible one counts.
+function findTitleInput() {
+  const inputs = document.querySelectorAll('input[placeholder="Song Title (Optional)"]');
+  return [...inputs].find((el) => el.offsetParent !== null);
+}
+
 function setReactValue(el, value) {
   const proto = el instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
   const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
@@ -106,6 +112,10 @@ async function fillForm(job) {
   await setLyrics(lyricsEl, job.lyrics);
   setReactValue(styleEl, job.style);
   setReactValue(excludeEl, job.exclude);
+  if (job.title) {
+    const titleEl = await waitFor(findTitleInput, FORM_TIMEOUT_MS, 'song title input');
+    setReactValue(titleEl, job.title);
+  }
 
   await waitFor(() => {
     const button = document.querySelector(CREATE_SELECTOR);

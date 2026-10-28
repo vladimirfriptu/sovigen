@@ -50,6 +50,12 @@ def read_variant(slug: str, variant: str) -> dict:
     return {"lyrics": lyrics, "style": style, "exclude": exclude}
 
 
+def clip_title(slug: str, variant: str) -> str:
+    number = re.search(r"-(\d+)$", slug)
+    prefix = number.group(1) if number else slug
+    return f"{prefix}_{variant}"
+
+
 def list_variants(slug: str) -> list:
     vdir = paths.song_dir(slug) / "variants"
     if not vdir.is_dir():
@@ -89,7 +95,9 @@ def send_to_suno(slug, variants, pause, bridge, sleep=time.sleep) -> list:
     for index, (variant, data) in enumerate(jobs):
         if index:
             sleep(pause)
-        job_id = bridge.submit({"slug": slug, "variant": variant, **data})
+        job_id = bridge.submit(
+            {"slug": slug, "variant": variant, "title": clip_title(slug, variant), **data}
+        )
         result = bridge.wait_result(job_id, RESULT_WAIT_SECONDS)
         if result is None:
             result = {"ok": False, "clips": 0, "error": "no answer from the extension"}

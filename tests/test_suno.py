@@ -182,3 +182,28 @@ def test_successful_send_adds_clips_to_suno_takes(tmp_path, monkeypatch):
     suno.send_to_suno("song", ["a"], 0, FakeBridge([OK]))
     assert meta_mod.read_meta(sdir)["suno_takes"] == 2
 
+
+
+@pytest.mark.parametrize(
+    "slug, expected",
+    [
+        ("освіти-мої-очі-псалом-13", "13_a"),
+        ("небеса-несут", "небеса-несут_a"),
+    ],
+)
+def test_clip_title(slug, expected):
+    assert suno.clip_title(slug, "a") == expected
+
+
+def test_send_passes_title_to_the_job(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    (tmp_path / "psalm-13").mkdir()
+    from sovigen import meta as meta_mod
+    meta_mod.write_meta(tmp_path / "psalm-13", meta_mod.new_meta("P", "psalm-13", "2026-10-28"))
+    vdir = tmp_path / "psalm-13" / "variants" / "b"
+    vdir.mkdir(parents=True)
+    (vdir / "suno.md").write_text(SUNO_MD, encoding="utf-8")
+    (vdir / "lyrics.md").write_text(LYRICS_MD, encoding="utf-8")
+    bridge = FakeBridge([OK])
+    suno.send_to_suno("psalm-13", ["b"], 0, bridge)
+    assert bridge.submitted[0]["title"] == "13_b"
