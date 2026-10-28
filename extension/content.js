@@ -1,5 +1,5 @@
 // Set to true to fill the form without pressing Create.
-const DRY_RUN = false;
+const DRY_RUN = true;
 
 const POLL_MS = 3000;
 const FORM_TIMEOUT_MS = 30000;
@@ -44,10 +44,32 @@ function setReactValue(el, value) {
   el.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
+function pasteText(el, text) {
+  const data = new DataTransfer();
+  data.setData('text/plain', text);
+  const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true });
+  el.dispatchEvent(event);
+}
+
+function typeLines(text) {
+  const lines = text.split('\n');
+  lines.forEach((line, index) => {
+    if (index > 0) document.execCommand('insertParagraph');
+    if (line) document.execCommand('insertText', false, line);
+  });
+}
+
 function setLyrics(el, text) {
   el.focus();
   document.execCommand('selectAll');
-  document.execCommand('insertText', false, text);
+  document.execCommand('delete');
+  pasteText(el, text);
+  const lines = text.split('\n').filter(Boolean);
+  const pasted = el.innerText.includes(lines[lines.length - 1]);
+  if (pasted) return;
+  document.execCommand('selectAll');
+  document.execCommand('delete');
+  typeLines(text);
 }
 
 function selectAdvancedTab() {
