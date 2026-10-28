@@ -69,7 +69,7 @@ function clearEditor() {
 }
 
 // A flat result still contains every word, so the check counts lines, not text.
-function setLyrics(el, text) {
+async function setLyrics(el, text) {
   el.focus();
   const expected = nonEmptyLineCount(text);
   const attempts = [
@@ -79,10 +79,13 @@ function setLyrics(el, text) {
   ];
   for (const attempt of attempts) {
     clearEditor();
+    await sleep(300);
     attempt();
+    await sleep(700);
     if (nonEmptyLineCount(el.innerText) >= expected) return;
   }
-  throw new Error('lyrics editor lost the line breaks');
+  const seen = nonEmptyLineCount(el.innerText);
+  throw new Error(`lyrics editor lost the line breaks (${seen} of ${expected} lines)`);
 }
 
 function selectAdvancedTab() {
@@ -100,7 +103,7 @@ async function fillForm(job) {
   const styleEl = await waitFor(findStyleTextarea, FORM_TIMEOUT_MS, 'styles textarea');
   const excludeEl = await waitFor(() => document.querySelector(EXCLUDE_SELECTOR), FORM_TIMEOUT_MS, 'exclude styles');
 
-  setLyrics(lyricsEl, job.lyrics);
+  await setLyrics(lyricsEl, job.lyrics);
   setReactValue(styleEl, job.style);
   setReactValue(excludeEl, job.exclude);
 
