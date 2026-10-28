@@ -103,8 +103,10 @@ function selectAdvancedTab() {
 async function fillForm(job) {
   selectAdvancedTab();
   const lyricsEl = await waitFor(() => document.querySelector(LYRICS_SELECTOR), FORM_TIMEOUT_MS, 'lyrics editor');
-  const more = await waitFor(findMoreOptions, FORM_TIMEOUT_MS, 'More Options');
-  if (!document.querySelector(EXCLUDE_SELECTOR)) more.click();
+  // After an earlier job the block can stay open, and its toggle may be gone or renamed.
+  const ready = () => document.querySelector(EXCLUDE_SELECTOR) || findMoreOptions();
+  await waitFor(ready, FORM_TIMEOUT_MS, 'More Options or Exclude styles');
+  if (!document.querySelector(EXCLUDE_SELECTOR)) findMoreOptions().click();
 
   const styleEl = await waitFor(findStyleTextarea, FORM_TIMEOUT_MS, 'styles textarea');
   const excludeEl = await waitFor(() => document.querySelector(EXCLUDE_SELECTOR), FORM_TIMEOUT_MS, 'exclude styles');
