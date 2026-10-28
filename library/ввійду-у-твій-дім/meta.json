@@ -1,7 +1,7 @@
 {
   "title": "Ввійду у Твій дім",
   "slug": "ввійду-у-твій-дім",
-  "stage": "pre-published",
+  "stage": "published",
   "created": "2026-07-05",
   "source": null,
   "series": null,
@@ -10,7 +10,12 @@
   "variants": [],
   "chosen_variant": null,
   "suno_takes": 0,
-  "stage_history": [],
+  "stage_history": [
+    {
+      "stage": "published",
+      "at": "2026-10-28"
+    }
+  ],
   "meta_version": 3,
   "youtube_url": "https://www.youtube.com/watch?v=DGwU0SuoTwE"
 }

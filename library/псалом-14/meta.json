@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 14",
   "slug": "псалом-14",
-  "stage": "pre-published",
+  "stage": "published",
   "created": "2026-08-22",
   "source": "psalm-14",
   "series": "psalms",
@@ -80,6 +80,10 @@
     {
       "stage": "pre-published",
       "at": "2026-09-20"
+    },
+    {
+      "stage": "published",
+      "at": "2026-10-28"
     }
   ],
   "video_style": "static",
