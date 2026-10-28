@@ -21,6 +21,8 @@ def _song(lib, slug, stage, **extra):
     sdir.mkdir(parents=True)
     data = meta_mod.new_meta(slug.upper(), slug, "2026-10-28")
     data["stage"] = stage
+    if "meta_slug" in extra:
+        data["slug"] = extra.pop("meta_slug")
     data.update(extra)
     meta_mod.write_meta(sdir, data)
     return sdir
@@ -204,7 +206,7 @@ def test_a_composed_slug_finds_a_song_stored_with_a_decomposed_name(studio):
     nfd = unicodedata.normalize("NFD", "мій-щит")
     nfc = unicodedata.normalize("NFC", "мій-щит")
     assert nfd != nfc
-    _song(lib, nfd, "pre-published")
+    _song(lib, nfd, "pre-published", meta_slug=nfc)
     status, page = _post(base, "/publish", {"slug": nfc, "url": f"https://youtu.be/{VIDEO_ID}"})
     assert status == 200
     assert meta_mod.read_meta(lib / nfd)["stage"] == "published"
@@ -214,6 +216,6 @@ def test_a_composed_song_query_selects_the_decomposed_song(studio):
     base, lib = studio
     nfd = unicodedata.normalize("NFD", "мій-щит")
     nfc = unicodedata.normalize("NFC", "мій-щит")
-    _song(lib, nfd, "published", youtube_url=f"https://www.youtube.com/watch?v={VIDEO_ID}")
+    _song(lib, nfd, "published", meta_slug=nfc, youtube_url=f"https://www.youtube.com/watch?v={VIDEO_ID}")
     _, page = _get(base, "/?song=" + urllib.parse.quote(nfc))
     assert "<iframe" in page

@@ -81,7 +81,7 @@ def _songs_at_stage(stage: str) -> list[dict]:
         except (OSError, ValueError):
             continue
         if data.get("stage") == stage:
-            songs.append({"slug": slug, "dir": song_dir, **data})
+            songs.append({**data, "slug": slug, "dir": song_dir})
     return songs
 
 
@@ -96,7 +96,7 @@ def _prompted_songs() -> list[dict]:
         except (OSError, ValueError):
             continue
         if data.get("stage") == "prompted" and data.get("variants"):
-            songs.append({"slug": slug, "dir": song_dir, **data})
+            songs.append({**data, "slug": slug, "dir": song_dir})
     return songs
 
 
