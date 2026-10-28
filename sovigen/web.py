@@ -10,6 +10,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 import os
 import re
 import tempfile
+import unicodedata
 from threading import Lock
 
 from . import commands, meta, paths, suno, web_ui
@@ -25,6 +26,18 @@ _BUILD_LOCK = Lock()
 _SUNO_LOCK = Lock()
 SUNO_ONLINE_SECONDS = 10
 _bridge = None
+
+
+def _canonical_slug(raw):
+    # macOS keeps folder names decomposed (NFD) while browsers send composed
+    # text (NFC), so the same Cyrillic slug compares unequal as plain strings.
+    if not raw:
+        return raw
+    wanted = unicodedata.normalize("NFC", raw)
+    for slug in paths.list_song_slugs():
+        if unicodedata.normalize("NFC", slug) == wanted:
+            return slug
+    return raw
 
 
 def _suno_available() -> bool:
@@ -191,6 +204,7 @@ def _song_detail(slug: str) -> dict:
 def _page(message: str = "", *, kind: str = "", slug: str | None = None) -> bytes:
     rows = [row for row in commands.cmd_status() if row["stage"] not in ("?", "unreadable")]
     known = {row["slug"] for row in rows}
+    slug = _canonical_slug(slug)
     if slug not in known:
         yours = [row for row in rows if row["turn"] == "you"]
         slug = (yours or rows or [{"slug": None}])[0]["slug"]
@@ -277,7 +291,7 @@ class SovigenHandler(BaseHTTPRequestHandler):
         try:
             length = int(self.headers.get("Content-Length", 0))
             payload = json.loads(self.rfile.read(length) or b"{}")
-            slug = str(payload["slug"])
+            slug = _canonical_slug(str(payload["slug"]))
             variant = str(payload["variant"])
         except (ValueError, KeyError, TypeError):
             self._send_json({"ok": False, "error": "slug and variant are required"}, 400)
@@ -307,7 +321,7 @@ class SovigenHandler(BaseHTTPRequestHandler):
             self._send_html(_page(slug=wanted))
             return
         if parsed.path.startswith("/download/"):
-            slug = unquote(parsed.path.removeprefix("/download/"))
+            slug = _canonical_slug(unquote(parsed.path.removeprefix("/download/")))
             # A successful build advances ready -> pre-published.
             if slug not in paths.list_song_slugs():
                 self._send_html(_page("Песня не найдена.", kind="bad"), 404)
@@ -340,7 +354,7 @@ class SovigenHandler(BaseHTTPRequestHandler):
         try:
             fields, files = _read_form(self)
             with _BUILD_LOCK:
-                slug = fields.get("slug", "")
+                slug = _canonical_slug(fields.get("slug", ""))
                 if route == "/record-track":
                     song = next((s for s in _songs_at_stage("prompted") if s["slug"] == slug), None)
                     if not song:
