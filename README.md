@@ -137,7 +137,8 @@ just web                           # студия только на этом к�
 just web-lan                       # студия для телефона в локальной сети
 
 # залей youtube.mp4 на YouTube, затем:
-just publish my-track-name         # stage → published
+just publish my-track-name [url]   # stage → published; ссылка на YouTube по желанию
+just youtube my-track-name <url>   # добавить или поменять ссылку на YouTube
 
 just suno my-track-name [a]        # отправляет варианты в Suno через расширение Chrome (см. ниже)
 
@@ -160,7 +161,8 @@ python3 -m sovigen.cli import my-track-name ~/Downloads/take.wav
 python3 -m sovigen.cli build my-track-name
 python3 -m sovigen.cli build my-track-name --static
 python3 -m sovigen.cli build-all
-python3 -m sovigen.cli publish my-track-name
+python3 -m sovigen.cli publish my-track-name [url]
+python3 -m sovigen.cli youtube my-track-name <url>
 python3 -m sovigen.cli suno my-track-name [variant] [--pause 30]
 python3 -m sovigen.cli status [--json]
 
@@ -192,25 +194,33 @@ just web
    появившейся форме. Песня перейдёт в `ready`.
 4. Нажми «Собрать видео». Веб соберёт MP4 со статичной обложкой и переведёт
    песню в `pre-published`.
-5. В блоке «Подготовка к YouTube» скачай MP4 и скопируй по порядку заголовок,
+5. На стадии `pre-published` скачай MP4 и скопируй по порядку заголовок,
    описание и теги из `youtube.md`.
-6. Загрузи видео на YouTube вручную, затем зафиксируй публикацию командой
-   `just publish <slug>`.
+6. Загрузи видео на YouTube вручную. Затем вставь ссылку на него в студии и
+   нажми «Отметить опубликованным» (или `just publish <slug> <ссылка>`).
+   Ссылка сохранится в `meta.json` в поле `youtube_url`, а на странице
+   опубликованной песни видео откроется во встроенном плеере.
 
 Если аудио и обложка уже импортированы, `just release-static <slug>` проводит
 песню со стадии `recorded` или `ready` до `pre-published`: проверяет требования,
 при необходимости делает переход `recorded → ready`, собирает статичное видео
 и сверяет его разрешение, формат пикселей и длительность с треком. Готовое видео
-затем появится в веб-разделе для скачивания. Загрузка на YouTube и команда
-`just publish <slug>` остаются ручным шагом.
+затем появится в студии для скачивания. Загрузка на YouTube и отметка о публикации
+остаются ручным шагом.
 
 Максимальный размер загрузки — 160 МБ. `just web` слушает только localhost;
 `just web-lan` открывает доступ в локальной сети. Не публикуй сервер напрямую в
 интернет.
 
 Видео и загруженные медиа остаются локальными и по-прежнему исключены из Git.
-Студия показывает загрузки для `prompted` и `recorded`, форму сборки для `ready`
-и готовые к публикации видео для `pre-published`.
+Студия устроена вокруг песни: слева список («Ваш ход», «Ход Claude»,
+«Опубликовано»), справа только шаг, который нужен сейчас. `prompted` — варианты
+Suno и загрузка трека, `recorded` — обложка, `ready` — сборка видео,
+`pre-published` — скачивание и поля YouTube, `published` — плеер со ссылкой.
+На телефоне список выезжает по кнопке ☰.
+
+Если ссылки на YouTube у опубликованной песни ещё нет, добавь её в студии
+(«Добавить ссылку») или командой `just youtube <slug> <ссылка>`.
 
 ## Структура кода
 
@@ -226,6 +236,9 @@ sovigen/
   paths.py          # расположение library/ и папок песен
   suno.py           # разбор variants/<id>/{suno,lyrics}.md и отправка вариантов в Suno
   suno_bridge.py    # локальный сервер 127.0.0.1:8787, отдаёт задачи расширению
+  youtube.py        # разбор и нормализация ссылок на YouTube
+  web.py            # студия: данные и маршруты
+  web_ui.py         # студия: HTML, стили и скрипт страницы
 extension/          # расширение Chrome (Manifest V3, чистый JS), заполняет форму Suno
   slug.py           # slugify заголовка (Unicode-aware, сохраняет кириллицу)
 scripts/
