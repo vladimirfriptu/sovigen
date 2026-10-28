@@ -50,7 +50,14 @@ function setLyrics(el, text) {
   document.execCommand('insertText', false, text);
 }
 
+function selectAdvancedTab() {
+  const tabs = document.querySelectorAll('button[role=tab]');
+  const advanced = [...tabs].find((el) => el.textContent.trim() === 'Advanced');
+  if (advanced && advanced.getAttribute('aria-selected') !== 'true') advanced.click();
+}
+
 async function fillForm(job) {
+  selectAdvancedTab();
   const lyricsEl = await waitFor(() => document.querySelector(LYRICS_SELECTOR), FORM_TIMEOUT_MS, 'lyrics editor');
   const more = await waitFor(findMoreOptions, FORM_TIMEOUT_MS, 'More Options');
   if (!document.querySelector(EXCLUDE_SELECTOR)) more.click();
