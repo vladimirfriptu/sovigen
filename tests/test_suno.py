@@ -122,7 +122,20 @@ def test_generate_stops_session_on_failure(tmp_path, monkeypatch):
     assert fake.stopped
 
 
+def test_load_dotenv_fills_only_missing(tmp_path, monkeypatch):
+    creds = tmp_path / "creds"
+    creds.write_text("# c\nA_KEY=one\nB_KEY='two'\nSET_KEY=new\n", encoding="utf-8")
+    monkeypatch.delenv("A_KEY", raising=False)
+    monkeypatch.delenv("B_KEY", raising=False)
+    monkeypatch.setenv("SET_KEY", "old")
+    suno.load_dotenv(str(creds))
+    assert suno.os.environ["A_KEY"] == "one"
+    assert suno.os.environ["B_KEY"] == "two"
+    assert suno.os.environ["SET_KEY"] == "old"
+
+
 def test_generate_needs_credentials(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
     _write_variant(tmp_path, monkeypatch)
     monkeypatch.delenv("NOTTE_API_KEY", raising=False)
     monkeypatch.delenv("SUNO_PROFILE_ID", raising=False)

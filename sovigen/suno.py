@@ -8,7 +8,13 @@ from . import paths
 
 CREATE_URL = "https://suno.com/create"
 LYRICS_SELECTOR = '[aria-label="Lyrics editor"]'
-STYLE_SELECTOR = 'textarea[placeholder^="country metal"]'
+STYLE_SELECTOR = '[data-sovigen="style"]'
+TAG_STYLE_JS = (
+    "(() => { const t = [...document.querySelectorAll('textarea')].find(e => "
+    "e.offsetParent !== null && !e.getAttribute('aria-label') && "
+    "!e.placeholder.startsWith('Describe')); "
+    "if (t) t.setAttribute('data-sovigen', 'style'); return !!t; })()"
+)
 EXCLUDE_SELECTOR = 'input[placeholder="Exclude styles"]'
 CREATE_BUTTON_SELECTOR = 'button[aria-label="Create song"]'
 
@@ -22,8 +28,9 @@ OPEN_MORE_OPTIONS_JS = (
 )
 
 NEW_CLIPS_EXPECTED = 2
-CLIPS_TIMEOUT_SECONDS = 120
+CLIPS_TIMEOUT_SECONDS = 240
 CLIPS_POLL_SECONDS = 4
+FORM_TIMEOUT_SECONDS = 30
 STYLE_LIMIT = 1000
 LYRICS_LIMIT = 5000
 
@@ -33,6 +40,18 @@ ENV_PROFILE = "SUNO_PROFILE_ID"
 
 class SunoError(Exception):
     pass
+
+
+def load_dotenv(path: str = ".env") -> None:
+    if not os.path.isfile(path):
+        return
+    with open(path, encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 
 def _code_block_after(text: str, heading: str) -> str:
@@ -104,7 +123,11 @@ class Notte:
             self.session_id = None
 
     def page(self, *args: str) -> str:
-        return self._run("page", args[0], "--session-id", self.session_id, *args[1:])
+        try:
+            return self._run("page", args[0], "--session-id", self.session_id, *args[1:])
+        except SunoError as err:
+            target = args[1][:60] if len(args) > 1 else ""
+            raise SunoError(f"{err} (target: {target})") from err
 
     def eval_js(self, code: str) -> str:
         return self.page("eval-js", code)
@@ -117,7 +140,12 @@ def _list_clips(notte: Notte) -> list:
 def _wait_for_new_clips(notte: Notte, before: set) -> list:
     deadline = time.monotonic() + CLIPS_TIMEOUT_SECONDS
     while time.monotonic() < deadline:
-        new = [href for href in _list_clips(notte) if href not in before]
+        try:
+            new = [href for href in _list_clips(notte) if href not in before]
+        except SunoError as err:
+            if "CAPTCHA" not in str(err):
+                raise
+            new = []
         if len(new) >= NEW_CLIPS_EXPECTED:
             return new
         time.sleep(CLIPS_POLL_SECONDS)
@@ -127,10 +155,25 @@ def _wait_for_new_clips(notte: Notte, before: set) -> list:
     )
 
 
+def _wait_for_form(notte: Notte) -> None:
+    check = (
+        f"document.querySelector('{LYRICS_SELECTOR}') !== null && "
+        "[...document.querySelectorAll('div[role=button]')]"
+        ".some(e => e.textContent.trim() === 'More Options')"
+    )
+    deadline = time.monotonic() + FORM_TIMEOUT_SECONDS
+    while time.monotonic() < deadline:
+        if notte.eval_js(check).lower() == "true":
+            return
+        time.sleep(2)
+    raise SunoError("Suno create form not found: the profile is probably logged out")
+
+
 def generate(slug: str, variant: str, title: str = None, notte: Notte = None) -> list:
     data = read_variant(slug, variant)
 
     if notte is None:
+        load_dotenv()
         api_key = os.environ.get(ENV_API_KEY)
         profile_id = os.environ.get(ENV_PROFILE)
         if not api_key or not profile_id:
@@ -140,9 +183,10 @@ def generate(slug: str, variant: str, title: str = None, notte: Notte = None) ->
     notte.start()
     try:
         notte.page("goto", CREATE_URL)
+        _wait_for_form(notte)
         notte.eval_js(OPEN_MORE_OPTIONS_JS)
-        if notte.eval_js("document.querySelector('[aria-label=\"Lyrics editor\"]') !== null") != "true":
-            raise SunoError("Suno create form not found: the profile is probably logged out")
+        if notte.eval_js(TAG_STYLE_JS).lower() != "true":
+            raise SunoError("Styles textarea not found on the create page")
 
         notte.page("fill", LYRICS_SELECTOR, data["lyrics"])
         notte.page("fill", STYLE_SELECTOR, data["style"])
