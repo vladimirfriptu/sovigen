@@ -3,7 +3,7 @@
   "name": "sovigen Suno",
   "version": "0.1.0",
   "description": "Fills the Suno create form with a song variant sent by the local sovigen command.",
-  "host_permissions": ["https://suno.com/*", "http://127.0.0.1:8765/*"],
+  "host_permissions": ["https://suno.com/*", "http://127.0.0.1:8787/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {

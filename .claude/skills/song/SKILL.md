@@ -97,7 +97,8 @@ is visible. Then work through them.
 
 5. **At `prompted`, wait for the human.** There is no Suno API. The owner may
    ask to send the variants with `just suno <slug> [variant]` (Chrome extension,
-   see README); run it only on request, it spends credits. Otherwise say, in
+   Mac only, see README); run it only on request, it spends credits. On
+   fhome-ai or from the phone use the web studio's Suno block instead. Otherwise say, in
    Russian: «Сгенери все три в указанной модели Suno и послушай. Не скачивай
    каждый тест: как выберешь — скачай финальный дубль с платного плана и скажи
    какой вариант и откуда скачал файл, дальше я сам.» Suno now limits downloads,

@@ -48,6 +48,11 @@ workflow files when they differ.
   Suno credits and needs the owner's open Chrome tab, so run it only when the
   owner asks. Report its output as it is: `started (N clips)` or the error.
   Never edit `DRY_RUN` in `extension/content.js` without being asked.
+- Two working modes share the same stages and files (README, "Два режима
+  работы"). On the owner's Mac, variants go to Suno with `just suno`. On
+  fhome-ai (agent-pi) or from the phone there is no Chrome: use the web studio
+  (`just web-lan`) and its Suno copy block. If `just suno` reports that the
+  extension did not connect, you are in the second mode; do not retry it.
 - Media are intentionally ignored by Git. Never bypass `.gitignore` to commit
   audio, cover images, raw takes, or rendered video.
 

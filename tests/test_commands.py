@@ -461,7 +461,7 @@ def test_build_with_viz_remembers_the_choice(lib, monkeypatch):
     assert meta.read_meta(lib / "remembered")["video_style"] == "freqline"
 
 
-def test_rebuild_follows_the_remembered_style(lib, monkeypatch):
+def test_rebuild_ignores_the_remembered_style_and_stays_static(lib, monkeypatch):
     sdir = _make_song(lib, "again", stage="ready")
     _fake_ffmpeg_and_ffprobe(monkeypatch)
     commands.cmd_build("again", viz=True)
@@ -469,7 +469,7 @@ def test_rebuild_follows_the_remembered_style(lib, monkeypatch):
     meta.set_stage(sdir, "ready", "2026-08-14")
     calls = _fake_ffmpeg_and_ffprobe(monkeypatch)
     commands.cmd_build("again")
-    assert "showfreqs" in " ".join([cmd for cmd in calls if cmd[0] == "ffmpeg"][0])
+    assert "showfreqs" not in " ".join([cmd for cmd in calls if cmd[0] == "ffmpeg"][0])
 
 
 def test_build_fails_when_duration_is_unreadable(lib, monkeypatch):

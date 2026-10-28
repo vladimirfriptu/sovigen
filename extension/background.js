@@ -1,4 +1,4 @@
-const BRIDGE = 'http://127.0.0.1:8765';
+const BRIDGE = 'http://127.0.0.1:8787';
 
 async function pollJob() {
   try {

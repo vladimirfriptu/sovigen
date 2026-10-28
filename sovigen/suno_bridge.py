@@ -7,7 +7,7 @@ EXTENSION_ORIGIN_PREFIX = "chrome-extension://"
 
 
 class Bridge:
-    def __init__(self, port: int = 8765):
+    def __init__(self, port: int = 8787):
         self._queue = []
         self._results = {}
         self._events = {}
