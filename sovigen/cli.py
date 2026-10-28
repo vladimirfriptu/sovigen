@@ -2,7 +2,7 @@ import argparse
 import json
 import sys
 
-from . import commands
+from . import commands, suno
 
 
 def main(argv=None) -> int:
@@ -35,13 +35,18 @@ def main(argv=None) -> int:
     p_pub = sub.add_parser("publish")
     p_pub.add_argument("slug")
 
+    p_suno = sub.add_parser("suno")
+    p_suno.add_argument("slug")
+    p_suno.add_argument("variant")
+    p_suno.add_argument("--title", default=None)
+
     p_status = sub.add_parser("status")
     p_status.add_argument("--json", action="store_true")
 
     args = parser.parse_args(argv)
     try:
         return _dispatch(args)
-    except commands.CommandError as err:
+    except (commands.CommandError, suno.SunoError) as err:
         print(f"error: {err}", file=sys.stderr)
         return 1
 
@@ -84,6 +89,11 @@ def _dispatch(args) -> int:
     if args.command == "publish":
         commands.cmd_publish(args.slug)
         print(f"published {args.slug}")
+        return 0
+    if args.command == "suno":
+        urls = suno.generate(args.slug, args.variant, title=args.title)
+        for url in urls:
+            print(url)
         return 0
     if args.command == "status":
         rows = commands.cmd_status()

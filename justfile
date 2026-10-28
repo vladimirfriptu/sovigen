@@ -40,3 +40,7 @@ publish slug:
 # show all songs and their stages: just status [--json]
 status *args:
     {{python}} -m sovigen.cli status {{args}}
+
+# send one variant to Suno without downloading: just suno my-track a ["Title"]
+suno slug variant *args:
+    {{python}} -m sovigen.cli suno "{{slug}}" "{{variant}}" {{args}}
