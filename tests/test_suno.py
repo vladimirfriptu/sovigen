@@ -40,7 +40,7 @@ line two
 def _write_variant(tmp_path, monkeypatch, suno_md=SUNO_MD, lyrics_md=LYRICS_MD):
     monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
     vdir = tmp_path / "song" / "variants" / "a"
-    vdir.mkdir(parents=True)
+    vdir.mkdir(parents=True, exist_ok=True)
     (vdir / "suno.md").write_text(suno_md, encoding="utf-8")
     (vdir / "lyrics.md").write_text(lyrics_md, encoding="utf-8")
 
@@ -72,72 +72,113 @@ def test_read_variant_style_too_long(tmp_path, monkeypatch):
         suno.read_variant("song", "a")
 
 
-class FakeNotte:
-    def __init__(self, clips_after):
-        self.calls = []
-        self.clips_after = clips_after
-        self.clicked = False
-        self.stopped = False
+def _add_meta(tmp_path):
+    from sovigen import meta as meta_mod
 
-    def start(self):
-        self.calls.append(("start",))
-
-    def stop(self):
-        self.stopped = True
-
-    def page(self, *args):
-        self.calls.append(args)
-        if args[0] == "click":
-            self.clicked = True
-        return ""
-
-    def eval_js(self, code):
-        if "Lyrics editor" in code:
-            return "true"
-        if "a[href" in code:
-            return suno.json.dumps(self.clips_after if self.clicked else ["/song/old"])
-        return "true"
+    sdir = tmp_path / "song"
+    sdir.mkdir(exist_ok=True)
+    meta_mod.write_meta(sdir, meta_mod.new_meta("Song", "song", "2026-10-28"))
+    return sdir
 
 
-def test_generate_fills_form_and_returns_new_urls(tmp_path, monkeypatch):
-    _write_variant(tmp_path, monkeypatch)
-    fake = FakeNotte(["/song/old", "/song/n1", "/song/n2"])
-    urls = suno.generate("song", "a", notte=fake)
-    assert urls == ["https://suno.com/song/n1", "https://suno.com/song/n2"]
-    fills = [c for c in fake.calls if c[0] == "fill"]
-    assert [c[1] for c in fills] == [
-        suno.LYRICS_SELECTOR,
-        suno.STYLE_SELECTOR,
-        suno.EXCLUDE_SELECTOR,
-    ]
-    assert fake.stopped
+def _add_variant(tmp_path, name):
+    vdir = tmp_path / "song" / "variants" / name
+    vdir.mkdir(parents=True, exist_ok=True)
+    (vdir / "suno.md").write_text(SUNO_MD, encoding="utf-8")
+    (vdir / "lyrics.md").write_text(LYRICS_MD, encoding="utf-8")
 
 
-def test_generate_stops_session_on_failure(tmp_path, monkeypatch):
-    _write_variant(tmp_path, monkeypatch)
-    monkeypatch.setattr(suno, "CLIPS_TIMEOUT_SECONDS", 0)
-    fake = FakeNotte(["/song/old"])
+class FakeBridge:
+    def __init__(self, results, connected=True):
+        self.results = list(results)
+        self.connected = connected
+        self.submitted = []
+
+    def wait_for_extension(self, timeout):
+        return self.connected
+
+    def submit(self, job):
+        self.submitted.append(job)
+        return str(len(self.submitted))
+
+    def wait_result(self, job_id, timeout):
+        return self.results.pop(0)
+
+
+OK = {"ok": True, "clips": 2, "error": ""}
+
+
+def test_list_variants_sorted(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_variant(tmp_path, "b")
+    _add_variant(tmp_path, "a")
+    (tmp_path / "song" / "variants" / "c").mkdir()
+    assert suno.list_variants("song") == ["a", "b"]
+
+
+def test_list_variants_without_folder_raises(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    (tmp_path / "song").mkdir()
     with pytest.raises(suno.SunoError):
-        suno.generate("song", "a", notte=fake)
-    assert fake.stopped
+        suno.list_variants("song")
 
 
-def test_load_dotenv_fills_only_missing(tmp_path, monkeypatch):
-    creds = tmp_path / "creds"
-    creds.write_text("# c\nA_KEY=one\nB_KEY='two'\nSET_KEY=new\n", encoding="utf-8")
-    monkeypatch.delenv("A_KEY", raising=False)
-    monkeypatch.delenv("B_KEY", raising=False)
-    monkeypatch.setenv("SET_KEY", "old")
-    suno.load_dotenv(str(creds))
-    assert suno.os.environ["A_KEY"] == "one"
-    assert suno.os.environ["B_KEY"] == "two"
-    assert suno.os.environ["SET_KEY"] == "old"
+def test_unknown_variant_raises_before_extension_is_awaited(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_variant(tmp_path, "a")
+    bridge = FakeBridge([], connected=False)
+    with pytest.raises(suno.SunoError, match="no variant 'z'"):
+        suno.send_to_suno("song", ["z"], 0, bridge)
 
 
-def test_generate_needs_credentials(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    _write_variant(tmp_path, monkeypatch)
-    monkeypatch.delenv("NOTTE_API_KEY", raising=False)
-    monkeypatch.delenv("SUNO_PROFILE_ID", raising=False)
-    with pytest.raises(suno.SunoError):
-        suno.generate("song", "a")
+def test_no_extension_raises_with_hint(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_variant(tmp_path, "a")
+    with pytest.raises(suno.SunoError, match="open suno.com/create"):
+        suno.send_to_suno("song", ["a"], 0, FakeBridge([], connected=False))
+
+
+def test_send_submits_in_order_and_sleeps_between(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_meta(tmp_path)
+    _add_variant(tmp_path, "a")
+    _add_variant(tmp_path, "b")
+    bridge = FakeBridge([OK, OK])
+    pauses = []
+    results = suno.send_to_suno("song", ["a", "b"], 30, bridge, sleep=pauses.append)
+    assert [r["variant"] for r in results] == ["a", "b"]
+    assert [j["variant"] for j in bridge.submitted] == ["a", "b"]
+    assert pauses == [30]
+    assert bridge.submitted[0]["style"] == "folk, 70 bpm"
+
+
+def test_send_stops_after_failed_variant(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_meta(tmp_path)
+    _add_variant(tmp_path, "a")
+    _add_variant(tmp_path, "b")
+    bad = {"ok": False, "clips": 0, "error": "no new clips appeared"}
+    bridge = FakeBridge([bad, OK])
+    results = suno.send_to_suno("song", ["a", "b"], 0, bridge, sleep=lambda s: None)
+    assert len(results) == 1
+    assert results[0]["error"] == "no new clips appeared"
+    assert len(bridge.submitted) == 1
+
+
+def test_timeout_is_reported_as_failure(tmp_path, monkeypatch):
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    _add_meta(tmp_path)
+    _add_variant(tmp_path, "a")
+    results = suno.send_to_suno("song", ["a"], 0, FakeBridge([None]))
+    assert results[0]["ok"] is False
+
+
+def test_successful_send_adds_clips_to_suno_takes(tmp_path, monkeypatch):
+    from sovigen import meta as meta_mod
+
+    monkeypatch.setenv("SOVIGEN_LIBRARY", str(tmp_path))
+    sdir = _add_meta(tmp_path)
+    _add_variant(tmp_path, "a")
+    suno.send_to_suno("song", ["a"], 0, FakeBridge([OK]))
+    assert meta_mod.read_meta(sdir)["suno_takes"] == 2
+

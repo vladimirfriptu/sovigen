@@ -41,6 +41,6 @@ publish slug:
 status *args:
     {{python}} -m sovigen.cli status {{args}}
 
-# send one variant to Suno without downloading: just suno my-track a ["Title"]
-suno slug variant *args:
-    {{python}} -m sovigen.cli suno "{{slug}}" "{{variant}}" {{args}}
+# send a song's variants to Suno through the Chrome extension: just suno my-track [a] [--pause 30]
+suno slug *args:
+    {{python}} -m sovigen.cli suno "{{slug}}" {{args}}

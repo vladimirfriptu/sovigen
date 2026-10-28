@@ -2,7 +2,7 @@ import argparse
 import json
 import sys
 
-from . import commands, suno
+from . import commands, suno, suno_bridge
 
 
 def main(argv=None) -> int:
@@ -37,8 +37,8 @@ def main(argv=None) -> int:
 
     p_suno = sub.add_parser("suno")
     p_suno.add_argument("slug")
-    p_suno.add_argument("variant")
-    p_suno.add_argument("--title", default=None)
+    p_suno.add_argument("variant", nargs="?", default=None)
+    p_suno.add_argument("--pause", type=float, default=suno.DEFAULT_PAUSE_SECONDS)
 
     p_status = sub.add_parser("status")
     p_status.add_argument("--json", action="store_true")
@@ -91,10 +91,7 @@ def _dispatch(args) -> int:
         print(f"published {args.slug}")
         return 0
     if args.command == "suno":
-        urls = suno.generate(args.slug, args.variant, title=args.title)
-        for url in urls:
-            print(url)
-        return 0
+        return _run_suno(args)
     if args.command == "status":
         rows = commands.cmd_status()
         if args.json:
@@ -103,6 +100,24 @@ def _dispatch(args) -> int:
             _print_status(rows)
         return 0
     return 2
+
+
+def _run_suno(args) -> int:
+    variants = [args.variant] if args.variant else suno.list_variants(args.slug)
+    bridge = suno_bridge.Bridge()
+    bridge.start()
+    try:
+        results = suno.send_to_suno(args.slug, variants, args.pause, bridge)
+    finally:
+        bridge.stop()
+    failed = False
+    for row in results:
+        if row["ok"]:
+            print(f"{row['variant']}: started ({row['clips']} clips)")
+        else:
+            failed = True
+            print(f"{row['variant']}: failed: {row['error']}", file=sys.stderr)
+    return 1 if failed else 0
 
 
 def _print_status(rows) -> None:

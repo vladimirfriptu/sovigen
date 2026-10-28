@@ -1,57 +1,18 @@
-import json
-import os
 import re
-import subprocess
 import time
 
+from . import meta as meta_mod
 from . import paths
 
-CREATE_URL = "https://suno.com/create"
-LYRICS_SELECTOR = '[aria-label="Lyrics editor"]'
-STYLE_SELECTOR = '[data-sovigen="style"]'
-TAG_STYLE_JS = (
-    "(() => { const t = [...document.querySelectorAll('textarea')].find(e => "
-    "e.offsetParent !== null && !e.getAttribute('aria-label') && "
-    "!e.placeholder.startsWith('Describe')); "
-    "if (t) t.setAttribute('data-sovigen', 'style'); return !!t; })()"
-)
-EXCLUDE_SELECTOR = 'input[placeholder="Exclude styles"]'
-CREATE_BUTTON_SELECTOR = 'button[aria-label="Create song"]'
-
-CLIPS_JS = (
-    "JSON.stringify([...new Set([...document.querySelectorAll('a[href^=\"/song/\"]')]"
-    ".map(a => a.getAttribute('href')))])"
-)
-OPEN_MORE_OPTIONS_JS = (
-    "(() => { const b = [...document.querySelectorAll('div[role=button]')]"
-    ".find(e => e.textContent.trim() === 'More Options'); if (b) b.click(); return !!b; })()"
-)
-
-NEW_CLIPS_EXPECTED = 2
-CLIPS_TIMEOUT_SECONDS = 240
-CLIPS_POLL_SECONDS = 4
-FORM_TIMEOUT_SECONDS = 30
 STYLE_LIMIT = 1000
 LYRICS_LIMIT = 5000
-
-ENV_API_KEY = "NOTTE_API_KEY"
-ENV_PROFILE = "SUNO_PROFILE_ID"
+EXTENSION_WAIT_SECONDS = 20
+RESULT_WAIT_SECONDS = 330
+DEFAULT_PAUSE_SECONDS = 30
 
 
 class SunoError(Exception):
     pass
-
-
-def load_dotenv(path: str = ".env") -> None:
-    if not os.path.isfile(path):
-        return
-    with open(path, encoding="utf-8") as handle:
-        for line in handle:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, _, value = line.partition("=")
-            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 
 def _code_block_after(text: str, heading: str) -> str:
@@ -89,114 +50,57 @@ def read_variant(slug: str, variant: str) -> dict:
     return {"lyrics": lyrics, "style": style, "exclude": exclude}
 
 
-def _clean_exclude(exclude: str) -> str:
-    return exclude.replace("\n", " ").strip()
+def list_variants(slug: str) -> list:
+    vdir = paths.song_dir(slug) / "variants"
+    if not vdir.is_dir():
+        raise SunoError(f"{slug} has no variants/ folder")
+    names = []
+    for entry in sorted(vdir.iterdir()):
+        has_files = (entry / "suno.md").is_file() and (entry / "lyrics.md").is_file()
+        if entry.is_dir() and has_files:
+            names.append(entry.name)
+    if not names:
+        raise SunoError(f"{slug} has no variant with both suno.md and lyrics.md")
+    return names
 
 
-class Notte:
-    def __init__(self, api_key: str, profile_id: str):
-        self.env = dict(os.environ)
-        self.env["NOTTE_API_KEY"] = api_key
-        self.env.setdefault("NOTTE_API_URL", "https://us-prod.notte.cc")
-        self.env.setdefault("NOTTE_REQUEST_ORIGIN", "cli")
-        self.profile_id = profile_id
-        self.session_id = None
+def _bump_suno_takes(slug: str, clips: int) -> None:
+    sdir = paths.song_dir(slug)
+    meta = meta_mod.read_meta(sdir)
+    meta["suno_takes"] += clips
+    meta_mod.write_meta(sdir, meta)
 
-    def _run(self, *args: str) -> str:
-        proc = subprocess.run(
-            ["notte", *args], env=self.env, capture_output=True, text=True
+
+def send_to_suno(slug, variants, pause, bridge, sleep=time.sleep) -> list:
+    jobs = []
+    for variant in variants:
+        known = list_variants(slug)
+        if variant not in known:
+            raise SunoError(f"{slug} has no variant '{variant}' (have: {', '.join(known)})")
+        jobs.append((variant, read_variant(slug, variant)))
+
+    if not bridge.wait_for_extension(EXTENSION_WAIT_SECONDS):
+        raise SunoError(
+            "the extension did not connect: open suno.com/create in Chrome "
+            "with the sovigen extension loaded"
         )
-        if proc.returncode != 0:
-            detail = (proc.stderr or proc.stdout).strip()
-            raise SunoError(f"notte {args[0]} {args[1]} failed: {detail}")
-        return proc.stdout.strip()
 
-    def start(self) -> None:
-        out = self._run(
-            "sessions", "start", "--profile-id", self.profile_id, "-o", "json"
-        )
-        self.session_id = json.loads(out)["session_id"]
-
-    def stop(self) -> None:
-        if self.session_id:
-            self._run("sessions", "stop", "--session-id", self.session_id, "-y")
-            self.session_id = None
-
-    def page(self, *args: str) -> str:
-        try:
-            return self._run("page", args[0], "--session-id", self.session_id, *args[1:])
-        except SunoError as err:
-            target = args[1][:60] if len(args) > 1 else ""
-            raise SunoError(f"{err} (target: {target})") from err
-
-    def eval_js(self, code: str) -> str:
-        return self.page("eval-js", code)
-
-
-def _list_clips(notte: Notte) -> list:
-    return json.loads(notte.eval_js(CLIPS_JS))
-
-
-def _wait_for_new_clips(notte: Notte, before: set) -> list:
-    deadline = time.monotonic() + CLIPS_TIMEOUT_SECONDS
-    while time.monotonic() < deadline:
-        try:
-            new = [href for href in _list_clips(notte) if href not in before]
-        except SunoError as err:
-            if "CAPTCHA" not in str(err):
-                raise
-            new = []
-        if len(new) >= NEW_CLIPS_EXPECTED:
-            return new
-        time.sleep(CLIPS_POLL_SECONDS)
-    raise SunoError(
-        f"no new clips after {CLIPS_TIMEOUT_SECONDS}s: Suno may be out of credits, "
-        "or the profile is logged out"
-    )
-
-
-def _wait_for_form(notte: Notte) -> None:
-    check = (
-        f"document.querySelector('{LYRICS_SELECTOR}') !== null && "
-        "[...document.querySelectorAll('div[role=button]')]"
-        ".some(e => e.textContent.trim() === 'More Options')"
-    )
-    deadline = time.monotonic() + FORM_TIMEOUT_SECONDS
-    while time.monotonic() < deadline:
-        if notte.eval_js(check).lower() == "true":
-            return
-        time.sleep(2)
-    raise SunoError("Suno create form not found: the profile is probably logged out")
-
-
-def generate(slug: str, variant: str, title: str = None, notte: Notte = None) -> list:
-    data = read_variant(slug, variant)
-
-    if notte is None:
-        load_dotenv()
-        api_key = os.environ.get(ENV_API_KEY)
-        profile_id = os.environ.get(ENV_PROFILE)
-        if not api_key or not profile_id:
-            raise SunoError(f"set {ENV_API_KEY} and {ENV_PROFILE} in the environment")
-        notte = Notte(api_key, profile_id)
-
-    notte.start()
-    try:
-        notte.page("goto", CREATE_URL)
-        _wait_for_form(notte)
-        notte.eval_js(OPEN_MORE_OPTIONS_JS)
-        if notte.eval_js(TAG_STYLE_JS).lower() != "true":
-            raise SunoError("Styles textarea not found on the create page")
-
-        notte.page("fill", LYRICS_SELECTOR, data["lyrics"])
-        notte.page("fill", STYLE_SELECTOR, data["style"])
-        notte.page("fill", EXCLUDE_SELECTOR, _clean_exclude(data["exclude"]))
-        if title:
-            notte.page("fill", 'input[placeholder="Song Title (Optional)"]', title)
-
-        before = set(_list_clips(notte))
-        notte.page("click", CREATE_BUTTON_SELECTOR)
-        new = _wait_for_new_clips(notte, before)
-        return ["https://suno.com" + href for href in new]
-    finally:
-        notte.stop()
+    results = []
+    for index, (variant, data) in enumerate(jobs):
+        if index:
+            sleep(pause)
+        job_id = bridge.submit({"slug": slug, "variant": variant, **data})
+        result = bridge.wait_result(job_id, RESULT_WAIT_SECONDS)
+        if result is None:
+            result = {"ok": False, "clips": 0, "error": "no answer from the extension"}
+        row = {
+            "variant": variant,
+            "ok": bool(result.get("ok")),
+            "clips": int(result.get("clips") or 0),
+            "error": result.get("error", ""),
+        }
+        results.append(row)
+        if not row["ok"]:
+            break
+        _bump_suno_takes(slug, row["clips"])
+    return results

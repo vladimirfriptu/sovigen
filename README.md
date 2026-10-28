@@ -227,3 +227,16 @@ just test
   гита — открытый вопрос, issue [#1](https://github.com/vladimirfriptu/sovigen/issues/1).
 - Оживление обложки через Stable Video Diffusion + бесшовный луп/реверс —
   команды `animate` и `build --render` зарезервированы, но не реализованы.
+
+## Отправка вариантов в Suno
+
+Команда `just suno <slug> [вариант]` заполняет форму Suno из `variants/<id>/lyrics.md`
+и `suno.md` и нажимает Create. Если вариант не указан, уходят все по очереди
+(пауза 30 с, `--pause N` меняет её). Скачивания нет: слушать и лайкать — в самом Suno.
+
+Работает через расширение Chrome из `extension/` и локальный мост на `127.0.0.1:8765`:
+
+1. Откройте `chrome://extensions`, включите Developer mode, нажмите Load unpacked и выберите `extension/`.
+2. В `extension/content.js` поставьте `DRY_RUN = false` (при `true` форма заполняется, но Create не нажимается).
+3. Откройте `https://suno.com/create` в Chrome под своим аккаунтом и оставьте вкладку открытой.
+4. Запустите `just suno <slug>`. Если появится капча, решите её в той же вкладке.
