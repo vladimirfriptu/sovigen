@@ -51,25 +51,38 @@ function pasteText(el, text) {
   el.dispatchEvent(event);
 }
 
-function typeLines(text) {
+function typeLines(text, breakCommand) {
   const lines = text.split('\n');
   lines.forEach((line, index) => {
-    if (index > 0) document.execCommand('insertParagraph');
+    if (index > 0) document.execCommand(breakCommand);
     if (line) document.execCommand('insertText', false, line);
   });
 }
 
+function nonEmptyLineCount(value) {
+  return value.split('\n').filter((line) => line.trim()).length;
+}
+
+function clearEditor() {
+  document.execCommand('selectAll');
+  document.execCommand('delete');
+}
+
+// A flat result still contains every word, so the check counts lines, not text.
 function setLyrics(el, text) {
   el.focus();
-  document.execCommand('selectAll');
-  document.execCommand('delete');
-  pasteText(el, text);
-  const lines = text.split('\n').filter(Boolean);
-  const pasted = el.innerText.includes(lines[lines.length - 1]);
-  if (pasted) return;
-  document.execCommand('selectAll');
-  document.execCommand('delete');
-  typeLines(text);
+  const expected = nonEmptyLineCount(text);
+  const attempts = [
+    () => pasteText(el, text),
+    () => typeLines(text, 'insertParagraph'),
+    () => typeLines(text, 'insertLineBreak'),
+  ];
+  for (const attempt of attempts) {
+    clearEditor();
+    attempt();
+    if (nonEmptyLineCount(el.innerText) >= expected) return;
+  }
+  throw new Error('lyrics editor lost the line breaks');
 }
 
 function selectAdvancedTab() {
