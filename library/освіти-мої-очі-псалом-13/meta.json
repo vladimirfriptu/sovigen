@@ -38,10 +38,15 @@
       "id": "f",
       "style": "elevation",
       "angle": "молящийся держится за решение петь посреди угрозы"
+    },
+    {
+      "id": "g",
+      "style": "casting-crowns",
+      "angle": "личная молитва и доверие посреди ожидания"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 12,
+  "suno_takes": 20,
   "stage_history": [
     {
       "stage": "idea",
