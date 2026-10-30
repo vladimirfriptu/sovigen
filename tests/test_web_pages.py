@@ -108,6 +108,18 @@ def test_prompted_song_shows_a_strip_per_variant_and_hidden_send_button(studio):
     assert 'class="btn primary send-suno"' in page and "hidden" in page
 
 
+def test_newest_variant_is_first_and_selected(studio):
+    base, lib = studio
+    song = lib / "psalm-13"
+    data = meta_mod.read_meta(song)
+    data["variants"].append({"id": "b", "style": "new style", "angle": "new angle"})
+    meta_mod.write_meta(song, data)
+    _, page = _get(base, "/?song=psalm-13")
+    assert page.index('data-v="b"') < page.index('data-v="a"')
+    assert 'data-v="b" aria-selected="true"' in page
+    assert 'class="strip active" data-v="b"' in page
+
+
 def test_recorded_song_asks_for_a_cover(studio):
     base, _ = studio
     _, page = _get(base, "/?song=psalm-12")

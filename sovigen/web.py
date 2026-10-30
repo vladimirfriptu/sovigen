@@ -156,7 +156,7 @@ def _lyrics_value(path: Path) -> str:
 def _variant_cards(song: dict) -> list[dict]:
     chosen = song.get("chosen_variant")
     cards = []
-    for variant in song.get("variants", []):
+    for variant in reversed(song.get("variants", [])):
         variant_id = str(variant.get("id", ""))
         if not variant_id:
             continue
