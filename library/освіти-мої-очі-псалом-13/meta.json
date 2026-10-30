@@ -23,10 +23,25 @@
       "id": "c",
       "style": "cinematic-orchestral",
       "angle": "молитва от четырёх вопросов к песне"
+    },
+    {
+      "id": "d",
+      "style": "youth-guitar",
+      "angle": "людина співає молитву просто, як удома"
+    },
+    {
+      "id": "e",
+      "style": "hillsong",
+      "angle": "человек вновь задаёт вопросы, но отвечает доверием"
+    },
+    {
+      "id": "f",
+      "style": "elevation",
+      "angle": "молящийся держится за решение петь посреди угрозы"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 6,
+  "suno_takes": 12,
   "stage_history": [
     {
       "stage": "idea",
