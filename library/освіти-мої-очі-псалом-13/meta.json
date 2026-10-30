@@ -48,10 +48,20 @@
       "id": "h",
       "style": "youth-guitar",
       "angle": "короткая новая молитва в акустическом стиле D"
+    },
+    {
+      "id": "i",
+      "style": "arena-alt-pop",
+      "angle": "вопросы как пульс, затем тихое решение довериться"
+    },
+    {
+      "id": "j",
+      "style": "female-pop-rock",
+      "angle": "женский голос обращается к Богу, когда силы на исходе"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 26,
+  "suno_takes": 28,
   "stage_history": [
     {
       "stage": "idea",
