@@ -11,18 +11,18 @@
   "variants": [
     {
       "id": "a",
-      "style": "intimate-folk",
-      "angle": "человек, который каждый день придумывает новый способ спасти себя"
+      "style": "lauren-daigle",
+      "angle": "дневная скорбь и тихая молитва"
     },
     {
       "id": "b",
-      "style": "casting-crowns",
-      "angle": "молящийся держится за три коротких глагола, когда уже шатается"
+      "style": "king-and-country",
+      "angle": "угроза падения перед врагом"
     },
     {
       "id": "c",
-      "style": "chris-tomlin",
-      "angle": "человек заранее разучивает песню, которую решил спеть до ответа"
+      "style": "cinematic-orchestral",
+      "angle": "молитва от четырёх вопросов к песне"
     }
   ],
   "chosen_variant": null,

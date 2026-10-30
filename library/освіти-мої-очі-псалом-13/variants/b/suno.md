@@ -2,34 +2,29 @@
 song: освіти-мої-очі-псалом-13
 artifact: suno
 variant: b
-style: casting-crowns
+style: king-and-country
 model: v6-wild
 generation_phase: explore
 ---
 
-# Освіти мої очі (Псалом 13) — генерація варіанта b
+# Вариант b — генерация в Suno
 
 ## Режим генерации
 
-`v6-wild` / `explore` — шукаємо мелодію, де три дієслова припеву легко
-розрізняються й наростають без мелізмів. У `v6` потрібно перенести цей хук,
-баритонову подачу і момент тиші перед «А я».
+`v6-wild` / `explore`: найти ритм, фактуру и подачу; удачную находку перенести в `v6` для уточнения.
 
 ## Style
 
 ```
-contemporary Christian pop-rock ballad in a slow 6/8 at 72 BPM, male baritone lead, narrative delivery, low piano and acoustic guitar intro building to full band, warm analog drums, restrained electric guitar swells, a three-step chorus hook with a distinct melodic rise on each written imperative, clear Ukrainian diction, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, unresolved atmosphere under the final chorus
+cinematic pop-rock, driving tribal percussion, big taiko-style drums, layered male lead with brother-duo harmonies, orchestral strings under a modern pop structure, dramatic dynamic drops before the chorus, live bass and guitars, percussion below the lead vocal, 104 BPM, 4/4, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs
 ```
 
 ## Exclude Styles
 
 ```
-melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants, spontaneous worship, oversinging, vocal improvisation, EDM, trap drums, gospel choir, key change finale, arena anthem
+melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants, spontaneous worship, oversinging, vocal improvisation, EDM, trap drums
 ```
 
 ## Советы по генерации
 
-Ціль — 3:05–3:30. У приспіві слова «Поглянь», «Відповідай», «Освіти» повинні
-мати три ясні сходинки, а міст має початися майже без бенду. Відбраковуємо дубль,
-якщо останній приспів звучить так, ніби перемога вже сталася. Якщо Suno обрізає
-аутро, прибрати інструментальний програш після першого приспіву.
+104 BPM, 4/4, ориентир около трёх минут. Следить за чётким слоговым вокалом. Неудачный дубль: Барабаны заглушают слова или финал звучит как уже одержанная победа. Если Suno обрежет песню, убрать повтор припева или сгенерировать в два прохода и склеить.
