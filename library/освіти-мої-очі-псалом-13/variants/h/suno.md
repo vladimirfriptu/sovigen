@@ -16,7 +16,7 @@ generation_phase: precision
 ## Style
 
 ```
-acoustic guitar singalong, 4/4 at 104 BPM, bright strummed acoustic guitar with a capo, warm male mid-range lead singing plainly, group vocals singing the written lyrics in unison on every chorus and growing louder each time, words only, no wordless backing vocals, no crowd noise between lines, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics, light cajon and hand percussion only, simple three-chord harmony, live take feel as if recorded in one room with several people, no studio polish, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, concise arrangement, short instrumental intro and outro, no speech or whispering
+acoustic guitar singalong, 4/4 at 104 BPM, bright, high-register strummed acoustic guitar, warm male mid-range lead singing plainly, group vocals singing the written lyrics in unison on every chorus and growing louder each time, words only, no wordless backing vocals, no crowd noise between lines, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics, light cajon and hand percussion only, simple three-chord harmony, live take feel as if recorded in one room with several people, no studio polish, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, concise arrangement, short instrumental intro and outro, no speech or whispering
 ```
 
 ## Exclude Styles
