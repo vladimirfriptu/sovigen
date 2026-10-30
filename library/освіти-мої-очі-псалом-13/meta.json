@@ -58,10 +58,15 @@
       "id": "j",
       "style": "female-pop-rock",
       "angle": "женский голос обращается к Богу, когда силы на исходе"
+    },
+    {
+      "id": "k",
+      "style": "female-pop-rock",
+      "angle": "новая молитва в стиле J с припевом о доверии"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 28,
+  "suno_takes": 32,
   "stage_history": [
     {
       "stage": "idea",
