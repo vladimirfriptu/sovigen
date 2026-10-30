@@ -33,7 +33,6 @@
 | ? | `ти-спинив-сонце` | pre-published | не записан |
 | ? | `війна-царів` | published | не записан |
 | ? | `вознесись-над-волнами` | published | не записан |
-| ? | `небеса-несут` | draft | не записан |
 | 9 | `твердиня-в-час-скорботи` | published | [[styles/casting-crowns]] |
 | 10 | `цар-навіки-віків` | published | [[styles/youth-guitar]] |
 | 11 | `крила-складу-псалом-11` | published | [[styles/hillsong]] |
