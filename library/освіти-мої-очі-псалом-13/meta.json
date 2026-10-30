@@ -43,10 +43,15 @@
       "id": "g",
       "style": "casting-crowns",
       "angle": "личная молитва и доверие посреди ожидания"
+    },
+    {
+      "id": "h",
+      "style": "youth-guitar",
+      "angle": "короткая новая молитва в акустическом стиле D"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 20,
+  "suno_takes": 26,
   "stage_history": [
     {
       "stage": "idea",
