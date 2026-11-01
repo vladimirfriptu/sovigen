@@ -1,0 +1,40 @@
+{
+  "meta_version": 3,
+  "title": "Псалом 17",
+  "slug": "псалом-17",
+  "stage": "brief",
+  "created": "2026-11-01",
+  "source": "psalm-17",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "ночное самоиспытание и верные шаги"
+    },
+    {
+      "id": "b",
+      "style": "youth-brass",
+      "angle": "молодёжная группа просит укрыть её от окружившей угрозы"
+    },
+    {
+      "id": "c",
+      "style": "cinematic-orchestral",
+      "angle": "одинокий голос просит вмешаться, когда враг как лев у укрытия"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-11-01"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-11-01"
+    }
+  ]
+}
