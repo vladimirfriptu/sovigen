@@ -1,0 +1,40 @@
+{
+  "meta_version": 3,
+  "title": "Псалом 16",
+  "slug": "псалом-16",
+  "stage": "brief",
+  "created": "2026-11-01",
+  "source": "psalm-16",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "личная опора и ночное наставление"
+    },
+    {
+      "id": "b",
+      "style": "hillsong",
+      "angle": "община вместе исповедует Бога своей долей и защитой"
+    },
+    {
+      "id": "c",
+      "style": "cinematic-orchestral",
+      "angle": "надежда пути жизни перед лицом Шеола"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-11-01"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-11-01"
+    }
+  ]
+}
