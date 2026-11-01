@@ -7,7 +7,7 @@
   "source": "psalm-16",
   "series": "psalms",
   "language": "uk",
-  "style": "hillsong",
+  "style": "youth-brass",
   "variants": [
     {
       "id": "a",
@@ -16,7 +16,7 @@
     },
     {
       "id": "b",
-      "style": "hillsong",
+      "style": "youth-brass",
       "angle": "община вместе исповедует Бога своей долей и защитой"
     },
     {

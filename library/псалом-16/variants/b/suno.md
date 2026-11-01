@@ -1,7 +1,7 @@
 ---
 song: псалом-16
 artifact: suno
-style: hillsong
+style: youth-brass
 model: v6
 generation_phase: precision
 ---
