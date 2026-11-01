@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 16",
   "slug": "псалом-16",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-11-01",
   "source": "psalm-16",
   "series": "psalms",
@@ -42,6 +42,10 @@
     },
     {
       "stage": "prompted",
+      "at": "2026-11-01"
+    },
+    {
+      "stage": "recorded",
       "at": "2026-11-01"
     }
   ]
