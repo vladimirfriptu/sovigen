@@ -120,6 +120,43 @@ details.edit{margin-top:14px}details.edit summary{cursor:pointer;color:var(--mut
 """
 
 JS = """
+(function(){
+  'use strict';
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const standalone=navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches;
+  if(!ios||!standalone)return;
+  let start=null,indicator=null,ready=false;
+  const threshold=72;
+  function show(){
+    if(!indicator){
+      indicator=document.createElement('div');
+      indicator.setAttribute('role','status');indicator.setAttribute('aria-live','polite');
+      indicator.style.cssText='position:fixed;z-index:2147483646;top:env(safe-area-inset-top,8px);left:50%;transform:translate(-50%,-150%);padding:9px 14px;border-radius:999px;background:#8B93FF;color:#0c0d18;font:600 14px/1.3 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 2px 12px #0007;transition:transform .16s ease;pointer-events:none;white-space:nowrap';
+      document.body.appendChild(indicator);
+    }
+    indicator.textContent=ready?'Отпустите, чтобы обновить':'Потяните, чтобы обновить';
+    indicator.style.transform='translate(-50%,8px)';
+  }
+  function hide(){if(indicator)indicator.style.transform='translate(-50%,-150%)';}
+  document.addEventListener('touchstart',event=>{
+    const target=event.target;
+    if(event.touches.length!==1||document.scrollingElement.scrollTop>0||target.closest('a,button,input,textarea,select,summary,pre,[contenteditable="true"]')){start=null;return}
+    start={x:event.touches[0].clientX,y:event.touches[0].clientY};ready=false;
+  },{passive:true});
+  document.addEventListener('touchmove',event=>{
+    if(!start)return;
+    if(event.touches.length!==1){start=null;ready=false;hide();return}
+    const dx=event.touches[0].clientX-start.x,dy=event.touches[0].clientY-start.y;
+    if(dy<0||Math.abs(dx)>Math.abs(dy)){start=null;hide();return}
+    if(dy>8){event.preventDefault();ready=dy>=threshold;show()}
+  },{passive:false});
+  document.addEventListener('touchend',event=>{
+    if(event.touches.length){start=null;ready=false;hide();return}
+    if(start&&ready){start=null;hide();window.location.reload();return}
+    start=null;ready=false;hide();
+  },{passive:true});
+  document.addEventListener('touchcancel',()=>{start=null;ready=false;hide()},{passive:true});
+})();
 const $=s=>document.querySelector(s);
 const toast=t=>{const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2600)};
 async function copyText(value){
