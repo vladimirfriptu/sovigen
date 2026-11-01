@@ -2,12 +2,12 @@
   "meta_version": 3,
   "title": "Освіти мої очі (Псалом 13)",
   "slug": "освіти-мої-очі-псалом-13",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-08-15",
   "source": "psalm-13",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-guitar",
   "variants": [
     {
       "id": "a",
@@ -65,7 +65,7 @@
       "angle": "новая молитва в стиле J с припевом о доверии"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "d",
   "suno_takes": 32,
   "stage_history": [
     {
@@ -115,6 +115,10 @@
     {
       "stage": "prompted",
       "at": "2026-09-20"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-11-01"
     }
   ]
 }
