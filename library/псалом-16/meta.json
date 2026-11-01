@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 16",
   "slug": "псалом-16",
-  "stage": "recorded",
+  "stage": "pre-published",
   "created": "2026-11-01",
   "source": "psalm-16",
   "series": "psalms",
@@ -47,6 +47,15 @@
     {
       "stage": "recorded",
       "at": "2026-11-01"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-11-01"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-11-01"
     }
-  ]
+  ],
+  "video_style": "static"
 }
