@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 16",
   "slug": "псалом-16",
-  "stage": "pre-published",
+  "stage": "published",
   "created": "2026-11-01",
   "source": "psalm-16",
   "series": "psalms",
@@ -55,7 +55,12 @@
     {
       "stage": "pre-published",
       "at": "2026-11-01"
+    },
+    {
+      "stage": "published",
+      "at": "2026-11-01"
     }
   ],
-  "video_style": "static"
+  "video_style": "static",
+  "youtube_url": "https://www.youtube.com/watch?v=8xzekHVd_5k"
 }
