@@ -8,7 +8,7 @@ language: uk
 
 # Псалом 16 — варіант c
 
-[Intro: low strings only, no vocals]
+[Intro: instrumental only, no vocals]
 
 [Verse 1: solo voice over sparse strings]
 Збережи мене, Боже,
