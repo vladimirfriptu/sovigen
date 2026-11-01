@@ -7,7 +7,7 @@
   "source": "psalm-16",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "hillsong",
   "variants": [
     {
       "id": "a",
@@ -25,7 +25,7 @@
       "angle": "надежда пути жизни перед лицом Шеола"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "b",
   "suno_takes": 0,
   "stage_history": [
     {

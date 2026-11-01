@@ -15,7 +15,7 @@ generation_phase: precision
 ## Style
 
 ```
-contemporary Christian pop-rock ballad, steady 4/4 at 86 BPM, warm male lead, supporting group vocals singing the written lyrics in unison, words only, no wordless backing vocals, no crowd noise between lines, atmospheric electric guitar swells and wide reverb pads over a restrained rhythm section, anthemic short chorus that is easy to sing together, build gradually from soft verse to full band, lift the final chorus without a key change, end clearly after the written outro, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
+Contemporary Christian Pop-Rock Ballad, Steady 4/4 At 86 Bpm, Warm Male Lead, Supporting Group Vocals Singing The Written Lyrics In Unison, Words Only, No Wordless Backing Vocals, No Crowd Noise Between Lines, Atmospheric Electric Guitar Swells And Wide Reverb Pads Over A Restrained Rhythm Section, Anthemic Short Chorus That Is Easy To Sing Together, Build Gradually From Soft Verse To Full Band, Lift The Final Chorus Without A Key Change, End Clearly After The Written Outro, Clean Straight-Tone Vocal, Syllabic Delivery (One Note Per Syllable), Restrained On-The-Beat Phrasing, No Runs, No Ad-Libs, Every Sung Sound Is A Written Word, No Vocalizations, No Vocal Fills Between Lines, Silence Where There Are No Lyrics, Supportive Brass Ensemble In The Background With Rich Trumpet, Trombone, And French Horn Harmonies, Youthful Contemporary Production
 ```
 
 ## Exclude Styles
@@ -26,8 +26,8 @@ melisma, vocal runs, vocal riffs, ad-libs, ooohs and aaahs, whoa-oh chants, spon
 
 ## Советы по генерации
 
-86 BPM, 4/4; ориентир около 3 минут. Главное — чтобы общие голоса пели только
-написанные строки в унисон, без выкриков и распевок, а слова оставались
-разборчивыми. Неудачный дубль — если припев превращается в скандирование и
-перекрывает текст. При обрезании убери второй повтор `[Chorus]` или сгенерируй
-куплеты и финальную часть отдельно. Модель `v6`, фаза `precision`.
+86 BPM, 4/4; ориентир около 3 минут. Проверь, что общие голоса поют только
+написанные строки, а духовые поддерживают гармонию и не перекрывают их. Неудачный
+дубль — если припев превращается в скандирование или брасс забивает текст. При
+обрезании убери второй повтор `[Chorus]` или сгенерируй куплеты и финальную
+часть отдельно. Модель `v6`, фаза `precision`.
