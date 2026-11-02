@@ -1,0 +1,48 @@
+{
+  "meta_version": 3,
+  "title": "Псалом 18",
+  "slug": "псалом-18",
+  "stage": "prompted",
+  "created": "2026-11-02",
+  "source": "psalm-18",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "спасённый вспоминает личную молитву"
+    },
+    {
+      "id": "b",
+      "style": "youth-brass",
+      "angle": "община слышит свидетельство спасённого"
+    },
+    {
+      "id": "c",
+      "style": "cinematic-orchestral",
+      "angle": "свидетель видит бурю и спасение"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-11-02"
+    }
+  ]
+}
