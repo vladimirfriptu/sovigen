@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 16 (instrumental)",
   "slug": "псалом-16-instrumental",
-  "stage": "idea",
+  "stage": "pre-published",
   "created": "2026-11-02",
   "source": "psalm-16",
   "series": "psalms",
@@ -15,6 +15,31 @@
     {
       "stage": "idea",
       "at": "2026-11-02"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "ready",
+      "at": "2026-11-02"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-11-02"
     }
-  ]
+  ],
+  "video_style": "static"
 }
