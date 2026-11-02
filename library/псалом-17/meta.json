@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Псалом 17",
   "slug": "псалом-17",
-  "stage": "ready",
+  "stage": "pre-published",
   "created": "2026-11-01",
   "source": "psalm-17",
   "series": "psalms",
@@ -81,6 +81,11 @@
     {
       "stage": "ready",
       "at": "2026-11-02"
+    },
+    {
+      "stage": "pre-published",
+      "at": "2026-11-02"
     }
-  ]
+  ],
+  "video_style": "static"
 }
