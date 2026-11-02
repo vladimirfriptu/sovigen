@@ -1,0 +1,20 @@
+{
+  "meta_version": 3,
+  "title": "Псалом 16 (instrumental)",
+  "slug": "псалом-16-instrumental",
+  "stage": "idea",
+  "created": "2026-11-02",
+  "source": "psalm-16",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-11-02"
+    }
+  ]
+}
