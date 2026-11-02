@@ -231,3 +231,21 @@ def test_a_composed_song_query_selects_the_decomposed_song(studio):
     _song(lib, nfd, "published", meta_slug=nfc, youtube_url=f"https://www.youtube.com/watch?v={VIDEO_ID}")
     _, page = _get(base, "/?song=" + urllib.parse.quote(nfc))
     assert "<iframe" in page
+
+
+def test_recorded_song_previews_only_its_cover_options(studio, tmp_path):
+    base, lib = studio
+    options = lib / "psalm-12" / "raw" / "cover-options"
+    options.mkdir(parents=True)
+    (options / "1 cover.png").write_bytes(b"image data")
+    (options / "notes.txt").write_text("not an image")
+    (options / "escape.png").symlink_to(tmp_path / "outside.png")
+    _, page = _get(base, "/?song=psalm-12")
+    assert "Варианты обложки" in page
+    assert "1%20cover.png" in page
+    assert "notes.txt" not in page and "escape.png" not in page
+    with urllib.request.urlopen(base + "/cover-option?song=psalm-12&name=1%20cover.png") as response:
+        assert response.headers["Content-Type"] == "image/png"
+        assert response.read() == b"image data"
+    status, _ = _get(base, "/cover-option?song=psalm-12&name=..%2Fmeta.json")
+    assert status == 404

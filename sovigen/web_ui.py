@@ -79,6 +79,8 @@ details.f pre,.field pre{margin:0;padding:0 12px 12px;white-space:pre-wrap;overf
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,28px);max-width:760px;margin-top:18px}
 .panel:first-child{margin-top:0}
 .panel h2{font:700 20px/1.25 var(--display);margin:0 0 8px;letter-spacing:-.01em}.panel>p{color:var(--muted);margin:0 0 18px}
+.cover-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.cover-option{margin:0}.cover-option img{display:block;width:100%;height:auto;border-radius:12px}.cover-option figcaption{margin-top:6px;color:var(--muted);overflow-wrap:anywhere}
 .rows{display:grid;gap:8px}
 .r{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--night);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .r div{min-width:0}.r small{display:block;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -284,7 +286,16 @@ def _suno_panel(song: dict) -> str:
 
 
 def _cover_panel(song: dict) -> str:
-    return f"""<section class="panel"><h2>Загрузить обложку</h2>
+    cards = []
+    for name in song.get("cover_options", []):
+        url = f'/cover-option?song={quote(song["slug"], safe="")}&amp;name={quote(name, safe="")}'
+        cards.append(f'<figure class="cover-option"><a href="{url}" target="_blank" rel="noopener">'
+                     f'<img src="{url}" alt="{_e(name)}" loading="lazy"></a>'
+                     f'<figcaption>{_e(name)}</figcaption></figure>')
+    previews = (f'<section class="panel"><h2>Варианты обложки</h2>'
+                f'<p>Нажми на изображение, чтобы открыть его крупнее.</p>'
+                f'<div class="cover-grid">{"".join(cards)}</div></section>') if cards else ""
+    return previews + f"""<section class="panel"><h2>Загрузить обложку</h2>
       <p>Трек загружен. Добавь обложку, чтобы перейти к сборке видео. Перед сборкой проверь, что YouTube-заголовок и описание готовы.</p>
       <form class="form" action="/record-cover" method="post" enctype="multipart/form-data">
         <input type="hidden" name="slug" value="{_e(song["slug"])}">

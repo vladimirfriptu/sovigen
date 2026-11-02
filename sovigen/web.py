@@ -1,6 +1,7 @@
 """Small localhost upload-and-build interface for Sovigen."""
 
 import json
+import mimetypes
 from email import policy
 from email.parser import BytesParser
 from html import escape
@@ -180,6 +181,17 @@ def _variant_cards(song: dict) -> list[dict]:
     return cards
 
 
+def _cover_options(song_dir: Path) -> list[Path]:
+    directory = song_dir / "raw" / "cover-options"
+    if not directory.is_dir() or directory.is_symlink():
+        return []
+    return sorted(
+        (p for p in directory.iterdir()
+         if not p.is_symlink() and p.is_file() and p.suffix.lower() in IMAGE_EXTS),
+        key=lambda p: p.name,
+    )
+
+
 def _song_detail(slug: str) -> dict:
     song_dir = paths.song_dir(slug)
     data = meta.read_meta(song_dir)
@@ -192,6 +204,8 @@ def _song_detail(slug: str) -> dict:
         "variants": [],
         "youtube": None,
     }
+    if detail["stage"] == "recorded":
+        detail["cover_options"] = [p.name for p in _cover_options(song_dir)]
     if detail["stage"] == "prompted":
         detail["variants"] = _variant_cards({"dir": song_dir, **data})
     if detail["stage"] == "pre-published":
@@ -319,6 +333,26 @@ class SovigenHandler(BaseHTTPRequestHandler):
         if parsed.path == "/":
             wanted = parse_qs(parsed.query).get("song", [None])[0]
             self._send_html(_page(slug=wanted))
+            return
+        if parsed.path == "/cover-option":
+            query = parse_qs(parsed.query)
+            slug = _canonical_slug(query.get("song", [""])[0])
+            name = query.get("name", [""])[0]
+            if slug not in paths.list_song_slugs():
+                self.send_error(404)
+                return
+            image = next((p for p in _cover_options(paths.song_dir(slug)) if p.name == name), None)
+            if image is None:
+                self.send_error(404)
+                return
+            body = image.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", mimetypes.guess_type(image.name)[0] or "application/octet-stream")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
             return
         if parsed.path.startswith("/download/"):
             slug = _canonical_slug(unquote(parsed.path.removeprefix("/download/")))
