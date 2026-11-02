@@ -15,7 +15,7 @@ generation_phase: precision
 ## Style
 
 ```
-contemporary Christian pop-rock ballad, steady 4/4 at 86 BPM, warm male lead with a youthful ensemble of several distinct voices singing the written lyrics in unison or simple harmonies, words only, no wordless backing vocals, no crowd noise between lines, restrained rhythm section with atmospheric electric guitar swells and wide reverb pads, supportive brass band with trumpet, trombone and French horn harmonies in the background, short anthemic chorus that is easy to sing together, gradual build from soft verse to full band, youthful contemporary production, clear ending after the written outro, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
+contemporary Christian pop-rock ballad, steady 4/4 at 86 BPM, four distinct singers: two male and two female voices, clear role-separated verses and interweaving four-part harmonies in choruses, restrained rhythm section, atmospheric electric guitar swells and wide reverb pads, supportive background brass harmonies, prominent melodic violin solo leading the instrumental break, gradual build from soft verse to full band, youthful contemporary production, clean straight-tone vocals, syllabic delivery, restrained on-the-beat phrasing
 ```
 
 ## Exclude Styles

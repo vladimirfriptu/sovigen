@@ -2,12 +2,12 @@
   "meta_version": 3,
   "title": "Псалом 17",
   "slug": "псалом-17",
-  "stage": "prompted",
+  "stage": "recorded",
   "created": "2026-11-01",
   "source": "psalm-17",
   "series": "psalms",
   "language": "uk",
-  "style": null,
+  "style": "youth-brass",
   "variants": [
     {
       "id": "a",
@@ -55,7 +55,7 @@
       "angle": "человек удерживает шаг и обращается к Богу простыми короткими словами"
     }
   ],
-  "chosen_variant": null,
+  "chosen_variant": "b",
   "suno_takes": 0,
   "stage_history": [
     {
@@ -73,6 +73,10 @@
     {
       "stage": "prompted",
       "at": "2026-11-01"
+    },
+    {
+      "stage": "recorded",
+      "at": "2026-11-02"
     }
   ]
 }
