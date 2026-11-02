@@ -1,6 +1,21 @@
 {
   "title": "Не меч і не спис",
   "slug": "не-меч-і-не-спис",
-  "stage": "pre-published",
-  "created": "2026-06-25"
+  "stage": "published",
+  "created": "2026-06-25",
+  "source": null,
+  "series": null,
+  "language": "uk",
+  "style": null,
+  "variants": [],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "published",
+      "at": "2026-10-30"
+    }
+  ],
+  "meta_version": 3,
+  "youtube_url": "https://www.youtube.com/watch?v=H2H8THmTDQ0"
 }

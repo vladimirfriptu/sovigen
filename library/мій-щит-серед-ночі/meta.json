@@ -1,7 +1,7 @@
 {
   "title": "Мій щит серед ночі",
   "slug": "мій-щит-серед-ночі",
-  "stage": "pre-published",
+  "stage": "published",
   "created": "2026-06-25",
   "source": null,
   "series": null,
@@ -10,7 +10,12 @@
   "variants": [],
   "chosen_variant": null,
   "suno_takes": 0,
-  "stage_history": [],
+  "stage_history": [
+    {
+      "stage": "published",
+      "at": "2026-10-30"
+    }
+  ],
   "meta_version": 3,
   "youtube_url": "https://www.youtube.com/watch?v=aXfwhPSKIEQ"
 }

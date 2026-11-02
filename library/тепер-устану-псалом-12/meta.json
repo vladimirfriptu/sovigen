@@ -2,7 +2,7 @@
   "meta_version": 3,
   "title": "Тепер устану (Псалом 12)",
   "slug": "тепер-устану-псалом-12",
-  "stage": "pre-published",
+  "stage": "published",
   "created": "2026-08-15",
   "source": "psalm-12",
   "series": "psalms",
@@ -107,6 +107,10 @@
     {
       "stage": "pre-published",
       "at": "2026-10-27"
+    },
+    {
+      "stage": "published",
+      "at": "2026-10-30"
     }
   ],
   "video_style": "static",
