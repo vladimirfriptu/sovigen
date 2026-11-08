@@ -23,10 +23,25 @@
       "id": "c",
       "style": "cinematic-orchestral",
       "angle": "свидетель видит бурю и спасение"
+    },
+    {
+      "id": "d",
+      "style": "casting-crowns",
+      "angle": "человек признаёт свою слабость и вспоминает спасение"
+    },
+    {
+      "id": "e",
+      "style": "king-and-country",
+      "angle": "спасённый вспоминает, как земля ответила на его зов"
+    },
+    {
+      "id": "f",
+      "style": "hillsong",
+      "angle": "общий голос поёт о Боге, который даёт твёрдо стоять"
     }
   ],
   "chosen_variant": null,
-  "suno_takes": 0,
+  "suno_takes": 6,
   "stage_history": [
     {
       "stage": "idea",
