@@ -15,7 +15,7 @@ generation_phase: explore
 ## Style
 
 ```
-cinematic pop-rock, 4/4 at 98 BPM, driving tribal percussion, big taiko-style drums, layered male lead with brother-duo harmonies, orchestral strings under a modern pop structure, dramatic dynamic drops before the chorus, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, sparse verse and punchy chorus, written words only, clear ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
+cinematic pop-rock, 4/4 at 108 BPM, driving tribal percussion, big taiko-style drums, layered male lead with brother-duo harmonies, orchestral strings under a modern pop structure, dramatic dynamic drops before the chorus, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, sparse verse and punchy chorus, written words only, clear ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
 ```
 
 ## Exclude Styles

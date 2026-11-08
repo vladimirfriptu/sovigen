@@ -15,7 +15,7 @@ generation_phase: explore
 ## Style
 
 ```
-contemporary Christian pop-rock ballad, 3/4 at 84 BPM, anthemic chorus, male lead with supporting group vocals singing written lyrics in unison, words only, atmospheric electric guitar swells, wide reverb pads, steady build from soft verse to full-band anthem, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, clear gentle ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
+upbeat contemporary Christian pop-rock, 3/4 at 126 BPM, anthemic chorus, male lead with supporting group vocals singing written lyrics in unison, words only, atmospheric electric guitar swells, wide reverb pads, energetic live drums and bass throughout, rhythmic guitars, lift into a full-band anthem, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, clear decisive ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
 ```
 
 ## Exclude Styles

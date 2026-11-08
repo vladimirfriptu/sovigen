@@ -15,7 +15,7 @@ generation_phase: explore
 ## Style
 
 ```
-contemporary Christian pop-rock ballad, 6/8 at 74 BPM, male baritone lead, narrative delivery, acoustic guitar intro building to full band, warm analog drums, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, intimate verses and a warm restrained chorus, quiet ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
+rhythmic contemporary Christian pop-rock, 6/8 at 112 BPM, male baritone lead, narrative delivery, rhythmic acoustic guitar, bass and warm live drums from the first verse, full band chorus, clean straight-tone vocal, syllabic delivery (one note per syllable), restrained on-the-beat phrasing, no runs, no ad-libs, rhythmic verses and a strong melodic chorus, clear ending, every sung sound is a written word, no vocalizations, no vocal fills between lines, silence where there are no lyrics
 ```
 
 ## Exclude Styles
