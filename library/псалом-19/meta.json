@@ -1,0 +1,48 @@
+{
+  "meta_version": 3,
+  "title": "Псалом 19",
+  "slug": "псалом-19",
+  "stage": "prompted",
+  "created": "2026-11-08",
+  "source": "psalm-19",
+  "series": "psalms",
+  "language": "uk",
+  "style": null,
+  "variants": [
+    {
+      "id": "a",
+      "style": "intimate-folk",
+      "angle": "человек слушает тишину неба и обращается к Богу"
+    },
+    {
+      "id": "b",
+      "style": "youth-brass",
+      "angle": "ансамбль вместе радуется Божьему наставлению"
+    },
+    {
+      "id": "c",
+      "style": "cinematic-orchestral",
+      "angle": "свидетель видит путь солнца и склоняется в молитве"
+    }
+  ],
+  "chosen_variant": null,
+  "suno_takes": 0,
+  "stage_history": [
+    {
+      "stage": "idea",
+      "at": "2026-11-08"
+    },
+    {
+      "stage": "brief",
+      "at": "2026-11-08"
+    },
+    {
+      "stage": "lyrics",
+      "at": "2026-11-08"
+    },
+    {
+      "stage": "prompted",
+      "at": "2026-11-08"
+    }
+  ]
+}
